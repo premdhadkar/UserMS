@@ -12,5 +12,7 @@ public interface BuyerService {
 	public String deleteBuyer(String id) throws UserMSException;
 	
 	public String addToWishlist(String prodId,String buyerId) throws UserMSException;
+	
+	public String addToCart(String prodId, String buyerId, Integer quantity);
 
 }

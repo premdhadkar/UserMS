@@ -9,9 +9,11 @@ import org.springframework.stereotype.Service;
 
 import com.team21.dto.BuyerDTO;
 import com.team21.entity.BuyerEntity;
+import com.team21.entity.CartEntity;
 import com.team21.entity.WishlistEntity;
 import com.team21.exception.UserMSException;
 import com.team21.repository.BuyerRepository;
+import com.team21.repository.CartRepository;
 import com.team21.repository.WishlistRepository;
 import com.team21.utility.CompositeKey;
 import com.team21.validator.UserValidator;
@@ -19,8 +21,8 @@ import com.team21.validator.UserValidator;
 @Transactional
 @Service(value = "buyerService")
 public class BuyerServiceImpl implements BuyerService {
-	
-	//To maintain Buyer's Id in sequential manner
+
+	// To maintain Buyer's Id in sequential manner
 	private static int buyerCount;
 
 	static {
@@ -29,9 +31,12 @@ public class BuyerServiceImpl implements BuyerService {
 
 	@Autowired
 	private BuyerRepository buyerRepository;
-	
+
 	@Autowired
 	private WishlistRepository wishlistRepository;
+
+	@Autowired
+	private CartRepository cartRepository;
 
 	// Registration for Buyer
 	@Override
@@ -102,20 +107,49 @@ public class BuyerServiceImpl implements BuyerService {
 	@Override
 	public String addToWishlist(String prodId, String buyerId) throws UserMSException {
 
-		CompositeKey newWishCompositeKey = new CompositeKey(prodId, buyerId);
+		CompositeKey productBuyerCompositeKey = new CompositeKey(prodId, buyerId);
 
-		Optional<WishlistEntity> optional = wishlistRepository.findById(newWishCompositeKey);
-		
-		if(optional.isPresent())
+		Optional<WishlistEntity> optional = wishlistRepository.findById(productBuyerCompositeKey);
+
+		if (optional.isPresent())
 			throw new UserMSException("Product already present in Wishlist");
-		
+
 		WishlistEntity newWish = new WishlistEntity();
 
-		newWish.setCompoundId(newWishCompositeKey);
+		newWish.setCompoundId(productBuyerCompositeKey);
 
 		wishlistRepository.save(newWish);
 
 		return "Added Successfully to Wishlist";
+	}
+
+	// Add Product to Buyers's Cart
+	@Override
+	public String addToCart(String prodId, String buyerId, Integer quantity) {
+		CompositeKey productBuyerCompositeKey = new CompositeKey(prodId, buyerId);
+
+		Optional<CartEntity> optional = cartRepository.findById(productBuyerCompositeKey);
+
+		CartEntity cart;
+
+		if (optional.isPresent()) {
+
+			cart = optional.get();
+
+			quantity = quantity + cart.getQuantity();
+
+		} else {
+
+			cart = new CartEntity();
+
+			cart.setCompoundKey(productBuyerCompositeKey);
+		}
+
+		cart.setQuantity(quantity);
+
+		cartRepository.save(cart);
+
+		return "Added Successfully to Cart";
 	}
 
 }
