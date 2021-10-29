@@ -3,6 +3,7 @@ package com.team21.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -41,4 +42,16 @@ public class UserController {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
 		}
 	}
+
+	// Delete Buyer
+	@DeleteMapping(value = "/userMS/buyer/deregister/{id}")
+	public ResponseEntity<String> deleteBuyerAccount(@PathVariable String id) {
+		try {
+			String result = buyerService.deleteBuyer(id);
+			return new ResponseEntity<>(result, HttpStatus.OK);
+		} catch (UserMSException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+		}
+	}
+
 }

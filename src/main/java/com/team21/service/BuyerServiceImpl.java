@@ -75,4 +75,18 @@ public class BuyerServiceImpl implements BuyerService {
 		return "Logged in Successfully";
 	}
 
+	// Delete Buyer
+	@Override
+	public String deleteBuyer(String id) throws UserMSException {
+		
+		BuyerEntity buyer = buyerRepository.findByBuyerId(id);
+
+		if(buyer == null)
+			throw new UserMSException("Buyer does not exist!");
+		
+		buyerRepository.delete(buyer);
+		
+		return "Account Deleted Successfully";
+	}
+
 }
