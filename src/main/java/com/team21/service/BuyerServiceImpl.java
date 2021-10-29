@@ -1,5 +1,7 @@
 package com.team21.service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import javax.transaction.Transactional;
@@ -8,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.team21.dto.BuyerDTO;
+import com.team21.dto.CartDTO;
 import com.team21.entity.BuyerEntity;
 import com.team21.entity.CartEntity;
 import com.team21.entity.WishlistEntity;
@@ -150,6 +153,29 @@ public class BuyerServiceImpl implements BuyerService {
 		cartRepository.save(cart);
 
 		return "Added Successfully to Cart";
+	}
+
+	// Get List of Cart Items
+	@Override
+	public List<CartDTO> getCart(String id) throws UserMSException {
+		List<CartEntity> listOfProdsWithQty = cartRepository.findByCompoundKeyBuyerId(id);
+
+		if (listOfProdsWithQty.isEmpty())
+			throw new UserMSException("Cart is Empty");
+
+		List<CartDTO> CartDTOs = new ArrayList<CartDTO>();
+
+		for (CartEntity productFromCart : listOfProdsWithQty) {
+			CartDTO cartDTO = new CartDTO();
+
+			cartDTO.setBuyerId(productFromCart.getCompoundKey().getBuyerId());
+			cartDTO.setProdId(productFromCart.getCompoundKey().getProdId());
+			cartDTO.setQuantity(productFromCart.getQuantity());
+
+			CartDTOs.add(cartDTO);
+		}
+
+		return CartDTOs;
 	}
 
 }

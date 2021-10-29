@@ -1,15 +1,20 @@
 package com.team21.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.team21.dto.BuyerDTO;
+import com.team21.dto.CartDTO;
 import com.team21.exception.UserMSException;
 import com.team21.service.BuyerService;
 
@@ -101,6 +106,18 @@ public class UserController {
 //			}
 //			throw new ResponseStatusException(HttpStatus.NOT_FOUND, newMsg, e);
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+		}
+	}
+
+	// Get List of Cart Items
+	@GetMapping(value = "/userMS/buyer/cart/get/{buyerId}")
+	public ResponseEntity<List<CartDTO>> getProductListFromCart(@PathVariable String buyerId) throws UserMSException {
+		try {
+			List<CartDTO> CartDTOs = buyerService.getCart(buyerId);
+			return new ResponseEntity<>(CartDTOs, HttpStatus.ACCEPTED);
+		} catch (UserMSException e) {
+			System.out.println(e.getMessage());
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
 		}
 	}
 }
