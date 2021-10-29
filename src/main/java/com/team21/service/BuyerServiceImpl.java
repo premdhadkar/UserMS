@@ -129,6 +129,10 @@ public class BuyerServiceImpl implements BuyerService {
 	// Add Product to Buyers's Cart
 	@Override
 	public String addToCart(String prodId, String buyerId, Integer quantity) {
+		// if quantity to be added is zero
+		if (quantity == 0)
+			return "No Update needed";
+
 		CompositeKey productBuyerCompositeKey = new CompositeKey(prodId, buyerId);
 
 		Optional<CartEntity> optional = cartRepository.findById(productBuyerCompositeKey);
