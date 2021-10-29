@@ -54,4 +54,28 @@ public class UserController {
 		}
 	}
 
+	// Add Product to Buyer's WishList
+	@PostMapping(value = "/userMS/buyer/wishlist/add/{buyerId}/{prodId}")
+	public ResponseEntity<String> addToWishlist(@PathVariable String buyerId, @PathVariable String prodId)
+			throws UserMSException {
+		try {
+			/*
+			 * Here we will use rest template to fetch the product from ProductMS and from
+			 * that product we will fetch the product id if product is not found then we
+			 * will throw an exception which is commented below for now. for example:-
+			 * ProductDTO product = new
+			 * RestTemplate().getForObject(prodUri+"/prodMS/getById/"+prodId,
+			 * ProductDTO.class);
+			 */
+			String result = buyerService.addToWishlist(prodId, buyerId);
+			return new ResponseEntity<>(result, HttpStatus.ACCEPTED);
+		} catch (Exception e) {
+//			String newMsg = "Product invalid or Product already in wishlist";
+//			if (e.getMessage().equals("404 null")) {
+//				newMsg = "Product is unavailable or product id is invalid";
+//			}
+//			throw new ResponseStatusException(HttpStatus.NOT_FOUND, newMsg, e);
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+		}
+	}
 }

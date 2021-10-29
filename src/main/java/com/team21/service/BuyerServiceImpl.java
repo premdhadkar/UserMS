@@ -1,5 +1,7 @@
 package com.team21.service;
 
+import java.util.Optional;
+
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,14 +9,18 @@ import org.springframework.stereotype.Service;
 
 import com.team21.dto.BuyerDTO;
 import com.team21.entity.BuyerEntity;
+import com.team21.entity.WishlistEntity;
 import com.team21.exception.UserMSException;
 import com.team21.repository.BuyerRepository;
+import com.team21.repository.WishlistRepository;
+import com.team21.utility.CompositeKey;
 import com.team21.validator.UserValidator;
 
 @Transactional
 @Service(value = "buyerService")
 public class BuyerServiceImpl implements BuyerService {
-
+	
+	//To maintain Buyer's Id in sequential manner
 	private static int buyerCount;
 
 	static {
@@ -23,6 +29,9 @@ public class BuyerServiceImpl implements BuyerService {
 
 	@Autowired
 	private BuyerRepository buyerRepository;
+	
+	@Autowired
+	private WishlistRepository wishlistRepository;
 
 	// Registration for Buyer
 	@Override
@@ -78,15 +87,35 @@ public class BuyerServiceImpl implements BuyerService {
 	// Delete Buyer
 	@Override
 	public String deleteBuyer(String id) throws UserMSException {
-		
+
 		BuyerEntity buyer = buyerRepository.findByBuyerId(id);
 
-		if(buyer == null)
+		if (buyer == null)
 			throw new UserMSException("Buyer does not exist!");
-		
+
 		buyerRepository.delete(buyer);
-		
+
 		return "Account Deleted Successfully";
+	}
+
+	// Add Product to Buyers's WishList
+	@Override
+	public String addToWishlist(String prodId, String buyerId) throws UserMSException {
+
+		CompositeKey newWishCompositeKey = new CompositeKey(prodId, buyerId);
+
+		Optional<WishlistEntity> optional = wishlistRepository.findById(newWishCompositeKey);
+		
+		if(optional.isPresent())
+			throw new UserMSException("Product already present in Wishlist");
+		
+		WishlistEntity newWish = new WishlistEntity();
+
+		newWish.setCompoundId(newWishCompositeKey);
+
+		wishlistRepository.save(newWish);
+
+		return "Added Successfully to Wishlist";
 	}
 
 }
