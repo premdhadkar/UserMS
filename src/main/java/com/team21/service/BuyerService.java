@@ -7,4 +7,5 @@ public interface BuyerService {
 
 	public String buyerRegistration(BuyerDTO buyerDTO) throws UserMSException;
 
+	public String buyerLogin(String email, String password) throws UserMSException;
 }

@@ -26,6 +26,7 @@ public class BuyerServiceImpl implements BuyerService {
 	@Autowired
 	private BuyerRepository buyerRepository;
 
+	// Registration for Buyer
 	@Override
 	public String buyerRegistration(BuyerDTO buyerDTO) throws UserMSException {
 
@@ -53,6 +54,27 @@ public class BuyerServiceImpl implements BuyerService {
 
 		return buyer.getBuyerId();
 
+	}
+
+	// Login for Buyer
+	@Override
+	public String buyerLogin(String email, String password) throws UserMSException {
+		if (!UserValidator.validateEmail(email))
+			throw new UserMSException("You have entered wrong EmailId!");
+
+		BuyerEntity buyer = buyerRepository.findByEmail(email);
+
+		if (buyer == null)
+			throw new UserMSException("Buyer does not exist!");
+
+		if (!buyer.getPassword().equals(password))
+			throw new UserMSException("Wrong credentials");
+
+		buyer.setIsActive("True");
+
+		buyerRepository.save(buyer);
+
+		return "Logged in Successfully";
 	}
 
 }
