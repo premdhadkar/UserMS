@@ -16,11 +16,9 @@ import com.team21.validator.UserValidator;
 public class BuyerServiceImpl implements BuyerService {
 
 	private static int buyerCount;
-	private static int sellerCount;
 
 	static {
 		buyerCount = 100;
-		sellerCount = 100;
 	}
 
 	@Autowired
