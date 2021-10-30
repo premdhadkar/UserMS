@@ -144,4 +144,15 @@ public class UserController {
 
 		}
 	}
+
+	// Update Bonus Points
+	@GetMapping(value = "/userMS/updateBonusPoints/{buyerId}/{bonPoints}")
+	public ResponseEntity<String> updateBonusPoints(@PathVariable String buyerId, @PathVariable Integer bonPoints) {
+		try {
+			String result = buyerService.updateBonusPoints(buyerId, bonPoints);
+			return new ResponseEntity<>(result, HttpStatus.OK);
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
+		}
+	}
 }

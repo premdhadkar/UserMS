@@ -195,5 +195,22 @@ public class BuyerServiceImpl implements BuyerService {
 
 		return "Sucess! Cart item Deleted!";
 	}
+	
+	//Update Bonus points of Buyer
+	@Override
+	public String updateBonusPoints(String buyerId, Integer rewPoints) throws UserMSException {
+		
+		BuyerEntity buyer = buyerRepository.findByBuyerId(buyerId);
+
+		if (buyer == null)
+			throw new UserMSException("Buyer does not exist!");
+
+		buyer.setRewardPoints(rewPoints.toString());
+
+		buyerRepository.save(buyer);
+
+		return "Updated Bonus points for Buyer Id : " + buyer.getBuyerId();
+	}
+	
 
 }
