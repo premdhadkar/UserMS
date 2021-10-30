@@ -5,6 +5,7 @@ import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.team21.dto.LoginDTO;
 import com.team21.dto.SellerDTO;
 import com.team21.entity.SellerEntity;
 import com.team21.exception.UserMSException;
@@ -54,7 +55,9 @@ public class SellerServiceImpl implements SellerService {
 
 	// Seller Login
 	@Override
-	public String sellerLogin(String email, String password) throws UserMSException {
+	public String sellerLogin(LoginDTO loginDTO) throws UserMSException {
+		String email = loginDTO.getEmailId();
+		String password = loginDTO.getPassword();
 
 		if (!UserValidator.validateEmail(email))
 			throw new UserMSException("You have entered wrong emailid!");

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.team21.dto.BuyerDTO;
 import com.team21.dto.CartDTO;
+import com.team21.dto.LoginDTO;
 import com.team21.entity.BuyerEntity;
 import com.team21.entity.CartEntity;
 import com.team21.entity.WishlistEntity;
@@ -73,7 +74,10 @@ public class BuyerServiceImpl implements BuyerService {
 
 	// Login for Buyer
 	@Override
-	public String buyerLogin(String email, String password) throws UserMSException {
+	public String buyerLogin(LoginDTO loginDTO) throws UserMSException {
+		String email = loginDTO.getEmailId();
+		String password = loginDTO.getPassword();
+		 
 		if (!UserValidator.validateEmail(email))
 			throw new UserMSException("You have entered wrong EmailId!");
 

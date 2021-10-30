@@ -15,6 +15,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.team21.dto.BuyerDTO;
 import com.team21.dto.CartDTO;
+import com.team21.dto.LoginDTO;
 import com.team21.dto.SellerDTO;
 import com.team21.exception.UserMSException;
 import com.team21.service.BuyerService;
@@ -43,10 +44,10 @@ public class UserController {
 	}
 
 	// Login for Buyer
-	@PostMapping(value = "/userMS/buyer/login/{email}/{password}")
-	public ResponseEntity<String> loginBuyer(@PathVariable String email, @PathVariable String password) {
+	@PostMapping(value = "/userMS/buyer/login")
+	public ResponseEntity<String> loginBuyer(@RequestBody LoginDTO loginDTO) {
 		try {
-			String msg = buyerService.buyerLogin(email, password);
+			String msg = buyerService.buyerLogin(loginDTO);
 			return new ResponseEntity<>(msg, HttpStatus.OK);
 		} catch (UserMSException e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
@@ -225,10 +226,10 @@ public class UserController {
 	}
 
 	// Login for Seller
-	@PostMapping(value = "/userMS/seller/login/{email}/{password}")
-	public ResponseEntity<String> loginSeller(@PathVariable String email, @PathVariable String password) {
+	@PostMapping(value = "/userMS/seller/login")
+	public ResponseEntity<String> loginSeller(@RequestBody LoginDTO loginDTO) {
 		try {
-			String result = sellerService.sellerLogin(email, password);
+			String result = sellerService.sellerLogin(loginDTO);
 			return new ResponseEntity<String>(result, HttpStatus.OK);
 		} catch (UserMSException e) {
 			return new ResponseEntity<String>(e.getMessage(), HttpStatus.NOT_FOUND);
