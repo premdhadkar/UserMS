@@ -225,4 +225,19 @@ public class BuyerServiceImpl implements BuyerService {
 		return "Sucess! Wishlist item Deleted!";
 	}
 
+	// Move Product from Wishlist to cart
+	@Override
+	public String moveFromWishlistToCart(String buyerId, String prodId, Integer quantity) throws UserMSException {
+		// if quantity to be added is zero
+		if (quantity == 0)
+			return "No Update needed";
+
+		this.removeFromWishlist(buyerId, prodId);
+
+		String result = this.addToCart(prodId, buyerId, quantity);
+
+		return result;
+
+	}
+
 }
