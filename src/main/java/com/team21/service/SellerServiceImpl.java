@@ -29,7 +29,7 @@ public class SellerServiceImpl implements SellerService {
 	@Override
 	public String sellerRegistration(SellerDTO sellerDTO) throws UserMSException {
 
-		SellerEntity seller = sellerRepository.findByPhoneNumber(sellerDTO.getPhoneNumber());
+		SellerEntity seller = sellerRepository.findByEmail(sellerDTO.getEmail());
 
 		if (seller != null)
 			throw new UserMSException("Seller Already exist!");
@@ -79,10 +79,10 @@ public class SellerServiceImpl implements SellerService {
 	public String deleteSeller(String id) throws UserMSException {
 
 		SellerEntity seller = sellerRepository.findBySellerId(id);
-		
-		if(seller == null)
+
+		if (seller == null)
 			throw new UserMSException("Seller does not exist!");
-		
+
 		sellerRepository.delete(seller);
 
 		return "Account deleted successfully!";

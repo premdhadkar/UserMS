@@ -45,7 +45,7 @@ public class BuyerServiceImpl implements BuyerService {
 	@Override
 	public String buyerRegistration(BuyerDTO buyerDTO) throws UserMSException {
 
-		BuyerEntity buyer = buyerRepository.findByPhoneNumber(buyerDTO.getPhoneNumber());
+		BuyerEntity buyer = buyerRepository.findByEmail(buyerDTO.getEmail());
 
 		if (buyer != null)
 			throw new UserMSException("Buyer already exist");
