@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.team21.dto.LoginDTO;
 import com.team21.dto.SellerDTO;
+import com.team21.entity.BuyerEntity;
 import com.team21.entity.SellerEntity;
 import com.team21.exception.UserMSException;
 import com.team21.repository.SellerRepository;
@@ -30,16 +31,20 @@ public class SellerServiceImpl implements SellerService {
 	@Override
 	public String sellerRegistration(SellerDTO sellerDTO) throws UserMSException {
 
-		SellerEntity seller = sellerRepository.findByEmail(sellerDTO.getEmail());
+		// find if a seller with same email
+		SellerEntity sellerByEmail = sellerRepository.findByEmail(sellerDTO.getEmail());
+		// find if a seller with same phone number
+		SellerEntity sellerByPhoneNumber = sellerRepository.findByPhoneNumber(sellerDTO.getPhoneNumber());
 
-		if (seller != null)
-			throw new UserMSException("Seller Already exist!");
+		// using Demorgan's Law in programming logic
+		if (!(sellerByEmail == null && sellerByPhoneNumber == null))
+			throw new UserMSException("Seller already exist");
 
 		UserValidator.validateSeller(sellerDTO);
 
 		String id = "SELL" + sellerCount++;
 
-		seller = new SellerEntity();
+		SellerEntity seller = new SellerEntity();
 
 		seller.setEmail(sellerDTO.getEmail());
 		seller.setSellerId(id);

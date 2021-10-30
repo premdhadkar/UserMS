@@ -46,16 +46,20 @@ public class BuyerServiceImpl implements BuyerService {
 	@Override
 	public String buyerRegistration(BuyerDTO buyerDTO) throws UserMSException {
 
-		BuyerEntity buyer = buyerRepository.findByEmail(buyerDTO.getEmail());
+		// find if a buyer with same email
+		BuyerEntity buyerByEmail = buyerRepository.findByEmail(buyerDTO.getEmail());
+		// find if a buyer with same phone number
+		BuyerEntity buyerByPhoneNumber = buyerRepository.findByPhoneNumber(buyerDTO.getPhoneNumber());
 
-		if (buyer != null)
+		// using Demorgan's Law in programming logic
+		if (!(buyerByEmail == null && buyerByPhoneNumber == null))
 			throw new UserMSException("Buyer already exist");
 
 		UserValidator.validateBuyer(buyerDTO);
 
 		String id = "BUY" + buyerCount++;
 
-		buyer = new BuyerEntity();
+		BuyerEntity buyer = new BuyerEntity();
 
 		buyer.setBuyerId(id);
 		buyer.setEmail(buyerDTO.getEmail());
@@ -77,7 +81,7 @@ public class BuyerServiceImpl implements BuyerService {
 	public String buyerLogin(LoginDTO loginDTO) throws UserMSException {
 		String email = loginDTO.getEmailId();
 		String password = loginDTO.getPassword();
-		 
+
 		if (!UserValidator.validateEmail(email))
 			throw new UserMSException("You have entered wrong EmailId!");
 
