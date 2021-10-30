@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,11 +12,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.team21.dto.BuyerDTO;
 import com.team21.dto.CartDTO;
 import com.team21.dto.LoginDTO;
+import com.team21.dto.ProductDTO;
 import com.team21.dto.SellerDTO;
 import com.team21.exception.UserMSException;
 import com.team21.service.BuyerService;
@@ -247,5 +250,62 @@ public class UserController {
 			return new ResponseEntity<String>(e.getMessage(), HttpStatus.NOT_FOUND);
 		}
 	}
+
+	@PostMapping(value = "/seller/products/add", consumes = MediaType.APPLICATION_JSON_VALUE)
+	public String addProduct(@RequestBody ProductDTO productDTO) {
+		try {
+			/*
+			 * Here we will use rest template to fetch the product from ProductMS and from
+			 * that product we will fetch the product id if product is not found then we
+			 * will throw an exception which is commented below for now. for example:-
+			 * ProductDTO product = new
+			 * RestTemplate().getForObject(prodUri+"/prodMS/getById/"+prodId,
+			 * ProductDTO.class);
+			 */
+
+			// String response = new RestTemplate().postForObject(productUri, productDTO,
+			// String.class);
+			// return response;
+		} catch (Exception e) {
+			return e.getMessage();
+		}
+		return null;
+	}
+
+	@DeleteMapping(value = "/seller/products/delete/{prodId}")
+	public String deleteProduct(@PathVariable Integer prodId) {
+		try {
+			/*
+			 * Here we will use rest template to fetch the product from ProductMS and from
+			 * that product we will fetch the product id if product is not found then we
+			 * will throw an exception which is commented below for now. for example:-
+			 * ProductDTO product = new
+			 * RestTemplate().getForObject(prodUri+"/prodMS/getById/"+prodId,
+			 * ProductDTO.class);
+			 */
+			// new RestTemplate().delete(productUri+"delete/"+prodId);
+			String response = "Deleted Successfully";
+			return response;
+		} catch (Exception e) {
+			return e.getMessage();
+		}
+	}
+
+	/*
+	 * @PostMapping(value="/user/orderUpdate",consumes=MediaType.
+	 * APPLICATION_JSON_VALUE) public boolean orderUpdate(@RequestBody
+	 * OrderDetailsDTO orderDetails) {
+	 * userService.addRewardPoints(orderDetails.getBuyerId(),orderDetails.getAmount(
+	 * ));
+	 * 
+	 * List<ProductsOrderedDTO> productsOrdered=orderDetails.getProductsOrdered();
+	 * 
+	 * new RestTemplate().postForObject(productUri+"/reduceStock",
+	 * productsOrdered,Boolean.class);
+	 * 
+	 * return true;
+	 * 
+	 * }
+	 */
 
 }
