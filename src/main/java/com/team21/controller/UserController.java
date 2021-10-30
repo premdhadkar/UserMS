@@ -185,4 +185,17 @@ public class UserController {
 			return new ResponseEntity<String>(e.getMessage(), HttpStatus.NOT_FOUND);
 		}
 	}
+
+	// Delete seller
+	@DeleteMapping(value = "/userMS/seller/deregister/{id}")
+	public ResponseEntity<String> deleteSellerAccount(@PathVariable String id) {
+
+		try {
+			String msg = sellerService.deleteSeller(id);
+			return new ResponseEntity<>(msg, HttpStatus.OK);
+		} catch (UserMSException e) {
+			return new ResponseEntity<String>(e.getMessage(), HttpStatus.NOT_FOUND);
+		}
+	}
+
 }

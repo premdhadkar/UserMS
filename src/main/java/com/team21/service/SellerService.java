@@ -8,4 +8,7 @@ public interface SellerService {
 	public String sellerRegistration(SellerDTO sellerDTO) throws UserMSException;
 
 	public String sellerLogin(String email, String password) throws UserMSException;
+
+	public String deleteSeller(String id) throws UserMSException;
+
 }
