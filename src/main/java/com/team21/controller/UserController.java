@@ -15,14 +15,19 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.team21.dto.BuyerDTO;
 import com.team21.dto.CartDTO;
+import com.team21.dto.SellerDTO;
 import com.team21.exception.UserMSException;
 import com.team21.service.BuyerService;
+import com.team21.service.SellerService;
 
 @RestController
 public class UserController {
 
 	@Autowired
 	BuyerService buyerService;
+	
+	@Autowired
+	SellerService sellerService;
 
 	// Register the Buyer
 	@PostMapping(value = "/userMS/buyer/register")
@@ -154,5 +159,18 @@ public class UserController {
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
 		}
+	}
+
+	// Register the Seller
+	@PostMapping(value = "/userMS/seller/register")
+	public ResponseEntity<String> registerSeller(@RequestBody SellerDTO sellerDto) {
+
+		try {
+			String result = "Seller registered successfully with seller Id : " + sellerService.sellerRegistration(sellerDto);
+			return new ResponseEntity<>(result, HttpStatus.OK);
+		} catch (UserMSException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.EXPECTATION_FAILED);
+		}
+
 	}
 }
