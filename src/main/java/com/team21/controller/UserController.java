@@ -25,7 +25,7 @@ public class UserController {
 
 	@Autowired
 	BuyerService buyerService;
-	
+
 	@Autowired
 	SellerService sellerService;
 
@@ -166,11 +166,23 @@ public class UserController {
 	public ResponseEntity<String> registerSeller(@RequestBody SellerDTO sellerDto) {
 
 		try {
-			String result = "Seller registered successfully with seller Id : " + sellerService.sellerRegistration(sellerDto);
+			String result = "Seller registered successfully with seller Id : "
+					+ sellerService.sellerRegistration(sellerDto);
 			return new ResponseEntity<>(result, HttpStatus.OK);
 		} catch (UserMSException e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.EXPECTATION_FAILED);
 		}
 
+	}
+
+	// Login for Seller
+	@PostMapping(value = "/userMS/seller/login/{email}/{password}")
+	public ResponseEntity<String> loginSeller(@PathVariable String email, @PathVariable String password) {
+		try {
+			String result = sellerService.sellerLogin(email, password);
+			return new ResponseEntity<String>(result, HttpStatus.OK);
+		} catch (UserMSException e) {
+			return new ResponseEntity<String>(e.getMessage(), HttpStatus.NOT_FOUND);
+		}
 	}
 }

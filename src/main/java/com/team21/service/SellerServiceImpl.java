@@ -33,7 +33,7 @@ public class SellerServiceImpl implements SellerService {
 
 		if (seller != null)
 			throw new UserMSException("Seller Already exist!");
-		
+
 		UserValidator.validateSeller(sellerDTO);
 
 		String id = "SELL" + sellerCount++;
@@ -51,4 +51,27 @@ public class SellerServiceImpl implements SellerService {
 
 		return seller.getSellerId();
 	}
+
+	// Seller Login
+	@Override
+	public String sellerLogin(String email, String password) throws UserMSException {
+
+		if (!UserValidator.validateEmail(email))
+			throw new UserMSException("You have entered wrong emailid!");
+
+		SellerEntity seller = sellerRepository.findByEmail(email);
+
+		if (seller == null)
+			throw new UserMSException("Seller does not exist!");
+
+		if (!seller.getPassword().equals(password))
+			throw new UserMSException("Wrong credentials!");
+
+		seller.setIsActive("True");
+
+		sellerRepository.save(seller);
+
+		return "Logged in successfully!";
+	}
+
 }
