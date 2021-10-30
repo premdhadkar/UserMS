@@ -126,7 +126,7 @@ public class UserController {
 		}
 	}
 
-	// Remove product by buyerId and productId
+	// Remove item from Cart
 	@PostMapping(value = "/userMS/buyer/cart/remove/{buyerId}/{prodId}")
 	public ResponseEntity<String> removeFromCart(@PathVariable String buyerId, @PathVariable String prodId)
 			throws UserMSException {
@@ -145,7 +145,31 @@ public class UserController {
 			return new ResponseEntity<>(result, HttpStatus.OK);
 		} catch (UserMSException e) {
 			String errorMsg = e.getMessage();
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, errorMsg, e);
+			return new ResponseEntity<String>(errorMsg, HttpStatus.NOT_FOUND);
+
+		}
+	}
+
+	// Remove item from Wishlist
+	@PostMapping(value = "/userMS/buyer/wishlist/remove/{buyerId}/{prodId}")
+	public ResponseEntity<String> removeFromWishlist(@PathVariable String buyerId, @PathVariable String prodId)
+			throws UserMSException {
+
+		try {
+			/*
+			 * Here we will use rest template to fetch the product from ProductMS and from
+			 * that product we will fetch the product id if product is not found then we
+			 * will throw an exception which is commented below for now. for example:-
+			 * ProductDTO product = new
+			 * RestTemplate().getForObject(prodUri+"/prodMS/getById/"+prodId,
+			 * ProductDTO.class);
+			 */
+			String result = buyerService.removeFromWishlist(buyerId, prodId);
+
+			return new ResponseEntity<>(result, HttpStatus.OK);
+		} catch (UserMSException e) {
+			String errorMsg = e.getMessage();
+			return new ResponseEntity<String>(errorMsg, HttpStatus.NOT_FOUND);
 
 		}
 	}

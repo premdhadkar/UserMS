@@ -23,4 +23,6 @@ public interface BuyerService {
 	public String removeFromCart(String buyerId, String prodId) throws UserMSException;
 
 	public String updateBonusPoints(String buyerId, Integer rewPoints) throws UserMSException;
+	
+	public String removeFromWishlist(String buyerId, String prodId) throws UserMSException;
 }

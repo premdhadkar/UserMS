@@ -195,11 +195,11 @@ public class BuyerServiceImpl implements BuyerService {
 
 		return "Sucess! Cart item Deleted!";
 	}
-	
-	//Update Bonus points of Buyer
+
+	// Update Bonus points of Buyer
 	@Override
 	public String updateBonusPoints(String buyerId, Integer rewPoints) throws UserMSException {
-		
+
 		BuyerEntity buyer = buyerRepository.findByBuyerId(buyerId);
 
 		if (buyer == null)
@@ -211,6 +211,18 @@ public class BuyerServiceImpl implements BuyerService {
 
 		return "Updated Bonus points for Buyer Id : " + buyer.getBuyerId();
 	}
-	
+
+	// Remove products from Cart
+	@Override
+	public String removeFromWishlist(String buyerId, String prodId) throws UserMSException {
+		WishlistEntity wishlistItem = wishlistRepository.findByCompoundIdBuyerIdAndCompoundIdProdId(buyerId, prodId);
+
+		if (wishlistItem == null)
+			throw new UserMSException("Item not found in your wishlist!");
+
+		wishlistRepository.deleteByCompoundIdBuyerIdAndCompoundIdProdId(buyerId, prodId);
+
+		return "Sucess! Wishlist item Deleted!";
+	}
 
 }
