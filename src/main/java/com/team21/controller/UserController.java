@@ -120,4 +120,28 @@ public class UserController {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
 		}
 	}
+
+	// Remove product by buyerId and productId
+	@PostMapping(value = "/userMS/buyer/cart/remove/{buyerId}/{prodId}")
+	public ResponseEntity<String> removeFromCart(@PathVariable String buyerId, @PathVariable String prodId)
+			throws UserMSException {
+
+		try {
+			/*
+			 * Here we will use rest template to fetch the product from ProductMS and from
+			 * that product we will fetch the product id if product is not found then we
+			 * will throw an exception which is commented below for now. for example:-
+			 * ProductDTO product = new
+			 * RestTemplate().getForObject(prodUri+"/prodMS/getById/"+prodId,
+			 * ProductDTO.class);
+			 */
+			String result = buyerService.removeFromCart(buyerId, prodId);
+
+			return new ResponseEntity<>(result, HttpStatus.OK);
+		} catch (UserMSException e) {
+			String errorMsg = e.getMessage();
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, errorMsg, e);
+
+		}
+	}
 }

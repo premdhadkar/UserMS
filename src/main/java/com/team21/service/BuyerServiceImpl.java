@@ -182,4 +182,18 @@ public class BuyerServiceImpl implements BuyerService {
 		return CartDTOs;
 	}
 
+	// Remove products from Cart
+	@Override
+	public String removeFromCart(String buyerId, String prodId) throws UserMSException {
+
+		CartEntity cartItem = cartRepository.findByCompoundKeyBuyerIdAndCompoundKeyProdId(buyerId, prodId);
+
+		if (cartItem == null)
+			throw new UserMSException("Item not found in your cart!");
+
+		cartRepository.deleteByCompoundKeyBuyerIdAndCompoundKeyProdId(buyerId, prodId);
+
+		return "Sucess! Cart item Deleted!";
+	}
+
 }

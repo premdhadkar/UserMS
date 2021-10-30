@@ -20,4 +20,6 @@ public interface BuyerService {
 
 	public List<CartDTO> getCart(String id) throws UserMSException;
 
+	public String removeFromCart(String buyerId, String prodId) throws UserMSException;
+
 }
