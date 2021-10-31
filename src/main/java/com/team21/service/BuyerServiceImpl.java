@@ -145,12 +145,12 @@ public class BuyerServiceImpl implements BuyerService {
 		CompositeKey productBuyerCompositeKey = new CompositeKey(prodId, buyerId);
 
 		Optional<WishlistEntity> optionalWishlistEntity = wishlistRepository.findById(productBuyerCompositeKey);
-		
-		Optional<BuyerEntity> optionalBuyerEntity =  buyerRepository.findById(buyerId);
+
+		Optional<BuyerEntity> optionalBuyerEntity = buyerRepository.findById(buyerId);
 
 		if (!optionalBuyerEntity.isPresent())
 			throw new UserMSException("Buyer does not exist");
-		
+
 		if (optionalWishlistEntity.isPresent())
 			throw new UserMSException("Product already present in Wishlist");
 
@@ -165,7 +165,12 @@ public class BuyerServiceImpl implements BuyerService {
 
 	// Add Product to Buyers's Cart
 	@Override
-	public String addToCart(String prodId, String buyerId, Integer quantity) {
+	public String addToCart(String prodId, String buyerId, Integer quantity) throws UserMSException {
+		Optional<BuyerEntity> optionalBuyerEntity = buyerRepository.findById(buyerId);
+
+		if (!optionalBuyerEntity.isPresent())
+			throw new UserMSException("Buyer does not exist");
+
 		// if quantity to be added is zero
 		if (quantity == 0)
 			return "No Update needed";

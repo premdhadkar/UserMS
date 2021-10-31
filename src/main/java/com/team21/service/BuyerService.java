@@ -19,7 +19,7 @@ public interface BuyerService {
 
 	public String addToWishlist(String prodId, String buyerId) throws UserMSException;
 
-	public String addToCart(String prodId, String buyerId, Integer quantity);
+	public String addToCart(String prodId, String buyerId, Integer quantity) throws UserMSException;
 
 	public List<CartDTO> getCart(String id) throws UserMSException;
 

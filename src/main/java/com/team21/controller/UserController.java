@@ -91,19 +91,19 @@ public class UserController {
 			throws UserMSException {
 		try {
 			/*
-			 * Here we are using rest template to fetch the productDTO from ProductMS, and from
-			 * that productDTO we will fetch the product id. If product is not found then we
-			 * are throwing an exception 
+			 * Here we are using rest template to fetch the productDTO from ProductMS, and
+			 * from that productDTO we will fetch the product id. If product is not found
+			 * then we are throwing an exception
 			 */
 			ProductDTO productDTO = new RestTemplate().getForObject(productUri + "product/get/Id/" + prodId,
 					ProductDTO.class);
 			String result = buyerService.addToWishlist(productDTO.getProdId(), buyerId);
 			return new ResponseEntity<>(result, HttpStatus.ACCEPTED);
-		}catch(HttpClientErrorException e) {
-		    String errorMsg = "Product is unavailable or product id is invalid";
-		    return new ResponseEntity<String>(errorMsg, HttpStatus.BAD_REQUEST);
-			
-		}catch(Exception e) {
+		} catch (HttpClientErrorException e) {
+			String errorMsg = "Product is unavailable or product id is invalid";
+			return new ResponseEntity<String>(errorMsg, HttpStatus.BAD_REQUEST);
+
+		} catch (Exception e) {
 			String errorMsg = e.getMessage();
 			return new ResponseEntity<String>(errorMsg, HttpStatus.BAD_REQUEST);
 		}
@@ -115,22 +115,21 @@ public class UserController {
 			@PathVariable Integer quantity) throws UserMSException {
 		try {
 			/*
-			 * Here we will use rest template to fetch the product from ProductMS and from
-			 * that product we will fetch the product id if product is not found then we
-			 * will throw an exception which is commented below for now. for example:-
-			 * ProductDTO product = new
-			 * RestTemplate().getForObject(prodUri+"/prodMS/getById/"+prodId,
-			 * ProductDTO.class);
+			 * Here we are using rest template to fetch the productDTO from ProductMS, and
+			 * from that productDTO we will fetch the product id. If product is not found
+			 * then we are throwing an exception
 			 */
-			String result = buyerService.addToCart(prodId, buyerId, quantity);
+			ProductDTO productDTO = new RestTemplate().getForObject(productUri + "product/get/Id/" + prodId,
+					ProductDTO.class);
+			String result = buyerService.addToCart(productDTO.getProdId(), buyerId, quantity);
 			return new ResponseEntity<>(result, HttpStatus.ACCEPTED);
+		} catch (HttpClientErrorException e) {
+			String errorMsg = "Product is unavailable or product id is invalid";
+			return new ResponseEntity<String>(errorMsg, HttpStatus.BAD_REQUEST);
+
 		} catch (Exception e) {
-//			String newMsg = "Product invalid or Product already in wishlist";
-//			if (e.getMessage().equals("404 null")) {
-//				newMsg = "Product is unavailable or product id is invalid";
-//			}
-//			throw new ResponseStatusException(HttpStatus.NOT_FOUND, newMsg, e);
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+			String errorMsg = e.getMessage();
+			return new ResponseEntity<String>(errorMsg, HttpStatus.BAD_REQUEST);
 		}
 	}
 
