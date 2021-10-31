@@ -15,10 +15,11 @@ public class BuyerEntity {
 	private String phoneNumber;
 	private String password;
 	private String isPrivileged;
-	private String rewardPoints;
+	private Integer rewardPoints;
 	private String isActive;
 
 	// Getters and Setters
+
 	public String getBuyerId() {
 		return buyerId;
 	}
@@ -67,11 +68,11 @@ public class BuyerEntity {
 		this.isPrivileged = isPrivileged;
 	}
 
-	public String getRewardPoints() {
+	public Integer getRewardPoints() {
 		return rewardPoints;
 	}
 
-	public void setRewardPoints(String rewardPoints) {
+	public void setRewardPoints(Integer rewardPoints) {
 		this.rewardPoints = rewardPoints;
 	}
 

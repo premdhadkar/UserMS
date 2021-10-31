@@ -9,7 +9,7 @@ email varchar(30),
 phone_number varchar(10),
 password varchar(60),
 is_privileged varchar(5),
-reward_points varchar(20),
+reward_points int,
 is_active varchar(5),
 
 constraint buyer_pk primary key (buyer_id)

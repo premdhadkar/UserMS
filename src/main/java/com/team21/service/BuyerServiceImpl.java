@@ -68,7 +68,7 @@ public class BuyerServiceImpl implements BuyerService {
 		buyer.setPassword(buyerDTO.getPassword());
 		buyer.setIsActive("False");
 		buyer.setIsPrivileged("False");
-		buyer.setRewardPoints("0");
+		buyer.setRewardPoints(0);
 
 		buyerRepository.save(buyer);
 
@@ -104,11 +104,11 @@ public class BuyerServiceImpl implements BuyerService {
 	public BuyerDTO getSepcificBuyer(String buyerId) throws UserMSException {
 
 		Optional<BuyerEntity> optional = buyerRepository.findById(buyerId);
-		
+
 		BuyerDTO buyerDTO = null;
 		if (optional.isPresent()) {
-			buyerDTO=new BuyerDTO();
-			//System.out.println(optional.get().getBuyerId());
+			buyerDTO = new BuyerDTO();
+			// System.out.println(optional.get().getBuyerId());
 			BuyerEntity buyer = optional.get();
 			buyerDTO.setEmail(buyer.getEmail());
 			buyerDTO.setIsActive(buyer.getIsActive());
@@ -118,9 +118,9 @@ public class BuyerServiceImpl implements BuyerService {
 			buyerDTO.setPhoneNumber(buyer.getPhoneNumber());
 			buyerDTO.setRewardPoints(buyer.getRewardPoints());
 
-		}
-		else throw new UserMSException("No such buyer found");
-		
+		} else
+			throw new UserMSException("No such buyer found");
+
 		return buyerDTO;
 	}
 
@@ -228,20 +228,19 @@ public class BuyerServiceImpl implements BuyerService {
 		return "Sucess! Cart item Deleted!";
 	}
 
-	// Update Bonus points of Buyer
+	// Add Reward points of Buyer
 	@Override
-	public String updateBonusPoints(String buyerId, Integer rewPoints) throws UserMSException {
-
-		BuyerEntity buyer = buyerRepository.findByBuyerId(buyerId);
-
-		if (buyer == null)
-			throw new UserMSException("Buyer does not exist!");
-
-		buyer.setRewardPoints(rewPoints.toString());
-
-		buyerRepository.save(buyer);
-
-		return "Updated Bonus points for Buyer Id : " + buyer.getBuyerId();
+	public void addRewardPoints(String buyerId, double amount) {
+		Optional<BuyerEntity> optional = buyerRepository.findById(buyerId);
+		if (optional.isPresent() == true) {
+			int rewardPoints = optional.get().getRewardPoints();
+			int finalRewardPoints = rewardPoints + + ((int) amount / 100);
+			optional.get().setRewardPoints(finalRewardPoints);
+			if (finalRewardPoints >= 10000) {
+				optional.get().setIsPrivileged("True");
+			}
+			buyerRepository.save(optional.get());
+		}
 	}
 
 	// Remove products from Cart

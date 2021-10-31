@@ -12,8 +12,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.team21.dto.BuyerDTO;
 import com.team21.dto.CartDTO;
@@ -217,17 +215,6 @@ public class UserController {
 		}
 	}
 
-	// Update Bonus Points
-	@GetMapping(value = "/userMS/updateBonusPoints/{buyerId}/{bonPoints}")
-	public ResponseEntity<String> updateBonusPoints(@PathVariable String buyerId, @PathVariable Integer bonPoints) {
-		try {
-			String result = buyerService.updateBonusPoints(buyerId, bonPoints);
-			return new ResponseEntity<>(result, HttpStatus.OK);
-		} catch (Exception e) {
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
-		}
-	}
-
 	// Register the Seller
 	@PostMapping(value = "/userMS/seller/register")
 	public ResponseEntity<String> registerSeller(@RequestBody SellerDTO sellerDto) {
@@ -305,21 +292,16 @@ public class UserController {
 		}
 	}
 
-	/*
-	 * @PostMapping(value="/user/orderUpdate",consumes=MediaType.
-	 * APPLICATION_JSON_VALUE) public boolean orderUpdate(@RequestBody
-	 * OrderDetailsDTO orderDetails) {
-	 * userService.addRewardPoints(orderDetails.getBuyerId(),orderDetails.getAmount(
-	 * ));
-	 * 
-	 * List<ProductsOrderedDTO> productsOrdered=orderDetails.getProductsOrdered();
-	 * 
-	 * new RestTemplate().postForObject(productUri+"/reduceStock",
-	 * productsOrdered,Boolean.class);
-	 * 
-	 * return true;
-	 * 
-	 * }
-	 */
+//	@PostMapping(value = "/userMS/buyer/order", consumes = MediaType.APPLICATION_JSON_VALUE)
+//	public boolean orderUpdate(@RequestBody OrderDetailsDTO orderDetails) {
+//		buyerService.addRewardPoints(orderDetails.getBuyerId(), orderDetails.getAmount());
+//
+//		List<ProductsOrderedDTO> productsOrdered = orderDetails.getProductsOrdered();
+//
+//		new RestTemplate().postForObject(productUri + "/reduceStock", productsOrdered, Boolean.class);
+//
+//		return true;
+//
+//	}
 
 }

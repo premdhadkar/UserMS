@@ -9,10 +9,11 @@ public class BuyerDTO {
 	private String phoneNumber;
 	private String password;
 	private String isPrivileged;
-	private String rewardPoints;
+	private Integer rewardPoints;
 	private String isActive;
 
 	// Getters and Setters
+
 	public String getName() {
 		return name;
 	}
@@ -53,11 +54,11 @@ public class BuyerDTO {
 		this.isPrivileged = isPrivileged;
 	}
 
-	public String getRewardPoints() {
+	public Integer getRewardPoints() {
 		return rewardPoints;
 	}
 
-	public void setRewardPoints(String rewardPoints) {
+	public void setRewardPoints(Integer rewardPoints) {
 		this.rewardPoints = rewardPoints;
 	}
 
@@ -69,18 +70,12 @@ public class BuyerDTO {
 		this.isActive = isActive;
 	}
 
-	// Utility Methods
-
-	@Override
-	public String toString() {
-		return "BuyerDTO [name=" + name + ", email=" + email + ", phoneNumber=" + phoneNumber + ", password=" + password
-				+ ", isPrivileged=" + isPrivileged + ", rewardPoints=" + rewardPoints + ", isActive=" + isActive + "]";
-	}
-
 	@Override
 	public int hashCode() {
 		return Objects.hash(email, isActive, isPrivileged, name, password, phoneNumber, rewardPoints);
 	}
+
+	// Utility Methods
 
 	@Override
 	public boolean equals(Object obj) {

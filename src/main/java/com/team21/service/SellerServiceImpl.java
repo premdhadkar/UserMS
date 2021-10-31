@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 
 import com.team21.dto.LoginDTO;
 import com.team21.dto.SellerDTO;
-import com.team21.entity.BuyerEntity;
 import com.team21.entity.SellerEntity;
 import com.team21.exception.UserMSException;
 import com.team21.repository.SellerRepository;
