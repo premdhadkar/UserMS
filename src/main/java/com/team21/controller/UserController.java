@@ -121,6 +121,9 @@ public class UserController {
 			 */
 			ProductDTO productDTO = new RestTemplate().getForObject(productUri + "product/get/Id/" + prodId,
 					ProductDTO.class);
+			if (productDTO.getStock() >= quantity)
+				throw new UserMSException("Unable to process your request. Stock Insufficient, current stock value is "
+						+ productDTO.getStock());
 			String result = buyerService.addToCart(productDTO.getProdId(), buyerId, quantity);
 			return new ResponseEntity<>(result, HttpStatus.ACCEPTED);
 		} catch (HttpClientErrorException e) {
@@ -150,18 +153,8 @@ public class UserController {
 	@PostMapping(value = "/userMS/buyer/cart/remove/{buyerId}/{prodId}")
 	public ResponseEntity<String> removeFromCart(@PathVariable String buyerId, @PathVariable String prodId)
 			throws UserMSException {
-
 		try {
-			/*
-			 * Here we will use rest template to fetch the product from ProductMS and from
-			 * that product we will fetch the product id if product is not found then we
-			 * will throw an exception which is commented below for now. for example:-
-			 * ProductDTO product = new
-			 * RestTemplate().getForObject(prodUri+"/prodMS/getById/"+prodId,
-			 * ProductDTO.class);
-			 */
 			String result = buyerService.removeFromCart(buyerId, prodId);
-
 			return new ResponseEntity<>(result, HttpStatus.OK);
 		} catch (UserMSException e) {
 			String errorMsg = e.getMessage();
@@ -176,16 +169,7 @@ public class UserController {
 			throws UserMSException {
 
 		try {
-			/*
-			 * Here we will use rest template to fetch the product from ProductMS and from
-			 * that product we will fetch the product id if product is not found then we
-			 * will throw an exception which is commented below for now. for example:-
-			 * ProductDTO product = new
-			 * RestTemplate().getForObject(prodUri+"/prodMS/getById/"+prodId,
-			 * ProductDTO.class);
-			 */
 			String result = buyerService.removeFromWishlist(buyerId, prodId);
-
 			return new ResponseEntity<>(result, HttpStatus.OK);
 		} catch (UserMSException e) {
 			String errorMsg = e.getMessage();
