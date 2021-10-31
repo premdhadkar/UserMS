@@ -100,6 +100,30 @@ public class BuyerServiceImpl implements BuyerService {
 		return "Logged in Successfully";
 	}
 
+	@Override
+	public BuyerDTO getSepcificBuyer(String buyerId) throws UserMSException {
+
+		Optional<BuyerEntity> optional = buyerRepository.findById(buyerId);
+		
+		BuyerDTO buyerDTO = null;
+		if (optional.isPresent()) {
+			buyerDTO=new BuyerDTO();
+			//System.out.println(optional.get().getBuyerId());
+			BuyerEntity buyer = optional.get();
+			buyerDTO.setEmail(buyer.getEmail());
+			buyerDTO.setIsActive(buyer.getIsActive());
+			buyerDTO.setIsPrivileged(buyer.getIsPrivileged());
+			buyerDTO.setName(buyer.getName());
+			buyerDTO.setPassword(null);
+			buyerDTO.setPhoneNumber(buyer.getPhoneNumber());
+			buyerDTO.setRewardPoints(buyer.getRewardPoints());
+
+		}
+		else throw new UserMSException("No such buyer found");
+		
+		return buyerDTO;
+	}
+
 	// Delete Buyer
 	@Override
 	public String deleteBuyer(String id) throws UserMSException {

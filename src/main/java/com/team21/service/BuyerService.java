@@ -13,6 +13,8 @@ public interface BuyerService {
 
 	public String buyerLogin(LoginDTO loginDTO) throws UserMSException;
 
+	public BuyerDTO getSepcificBuyer(String buyerId) throws UserMSException;
+
 	public String deleteBuyer(String id) throws UserMSException;
 
 	public String addToWishlist(String prodId, String buyerId) throws UserMSException;

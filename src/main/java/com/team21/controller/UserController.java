@@ -57,6 +57,19 @@ public class UserController {
 		}
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@GetMapping(value = "/userMS/buyer/{buyerId}", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<BuyerDTO> getSepcificBuyerDetails(@PathVariable String buyerId) {
+		try {
+			BuyerDTO buyerDTO = buyerService.getSepcificBuyer(buyerId);
+			return new ResponseEntity<BuyerDTO>(buyerDTO, HttpStatus.OK);
+
+		} catch (Exception e) {
+			return new ResponseEntity(e.getMessage(), HttpStatus.NOT_FOUND);
+		}
+
+	}
+
 	// Delete Buyer
 	@DeleteMapping(value = "/userMS/buyer/deregister/{id}")
 	public ResponseEntity<String> deleteBuyerAccount(@PathVariable String id) {
@@ -119,14 +132,15 @@ public class UserController {
 	}
 
 	// Get List of Cart Items
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@GetMapping(value = "/userMS/buyer/cart/get/{buyerId}")
 	public ResponseEntity<List<CartDTO>> getProductListFromCart(@PathVariable String buyerId) throws UserMSException {
 		try {
 			List<CartDTO> CartDTOs = buyerService.getCart(buyerId);
 			return new ResponseEntity<>(CartDTOs, HttpStatus.ACCEPTED);
 		} catch (UserMSException e) {
-			System.out.println(e.getMessage());
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+
+			return new ResponseEntity(e.getMessage(), HttpStatus.NOT_FOUND);
 		}
 	}
 
@@ -252,7 +266,7 @@ public class UserController {
 	}
 
 	@PostMapping(value = "/seller/products/add", consumes = MediaType.APPLICATION_JSON_VALUE)
-	public String addProduct(@RequestBody ProductDTO productDTO) {
+	public ResponseEntity<String> addProduct(@RequestBody ProductDTO productDTO) {
 		try {
 			/*
 			 * Here we will use rest template to fetch the product from ProductMS and from
@@ -267,13 +281,13 @@ public class UserController {
 			// String.class);
 			// return response;
 		} catch (Exception e) {
-			return e.getMessage();
+			return new ResponseEntity<String>(e.getMessage(), HttpStatus.NOT_FOUND);
 		}
 		return null;
 	}
 
 	@DeleteMapping(value = "/seller/products/delete/{prodId}")
-	public String deleteProduct(@PathVariable Integer prodId) {
+	public ResponseEntity<String> deleteProduct(@PathVariable Integer prodId) {
 		try {
 			/*
 			 * Here we will use rest template to fetch the product from ProductMS and from
@@ -285,9 +299,9 @@ public class UserController {
 			 */
 			// new RestTemplate().delete(productUri+"delete/"+prodId);
 			String response = "Deleted Successfully";
-			return response;
+			return new ResponseEntity<String>(response, HttpStatus.NOT_FOUND);
 		} catch (Exception e) {
-			return e.getMessage();
+			return new ResponseEntity<String>(e.getMessage(), HttpStatus.NOT_FOUND);
 		}
 	}
 
