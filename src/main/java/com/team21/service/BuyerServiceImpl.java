@@ -144,9 +144,14 @@ public class BuyerServiceImpl implements BuyerService {
 
 		CompositeKey productBuyerCompositeKey = new CompositeKey(prodId, buyerId);
 
-		Optional<WishlistEntity> optional = wishlistRepository.findById(productBuyerCompositeKey);
+		Optional<WishlistEntity> optionalWishlistEntity = wishlistRepository.findById(productBuyerCompositeKey);
+		
+		Optional<BuyerEntity> optionalBuyerEntity =  buyerRepository.findById(buyerId);
 
-		if (optional.isPresent())
+		if (!optionalBuyerEntity.isPresent())
+			throw new UserMSException("Buyer does not exist");
+		
+		if (optionalWishlistEntity.isPresent())
 			throw new UserMSException("Product already present in Wishlist");
 
 		WishlistEntity newWish = new WishlistEntity();
