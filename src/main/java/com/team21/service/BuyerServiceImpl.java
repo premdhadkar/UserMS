@@ -234,13 +234,23 @@ public class BuyerServiceImpl implements BuyerService {
 		Optional<BuyerEntity> optional = buyerRepository.findById(buyerId);
 		if (optional.isPresent() == true) {
 			int rewardPoints = optional.get().getRewardPoints();
-			int finalRewardPoints = rewardPoints + + ((int) amount / 100);
+			int finalRewardPoints = rewardPoints + +((int) amount / 100);
 			optional.get().setRewardPoints(finalRewardPoints);
 			if (finalRewardPoints >= 10000) {
 				optional.get().setIsPrivileged("True");
 			}
 			buyerRepository.save(optional.get());
 		}
+	}
+
+	// get reward points for specific user
+	@Override
+	public Integer getRewardPoints(String buyerId) {
+		Optional<BuyerEntity> optional = buyerRepository.findById(buyerId);
+		if (optional.isPresent()) {
+			return optional.get().getRewardPoints();
+		} else
+			return 0;
 	}
 
 	// Remove products from Cart

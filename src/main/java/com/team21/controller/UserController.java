@@ -3,6 +3,7 @@ package com.team21.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +13,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
 
 import com.team21.dto.BuyerDTO;
 import com.team21.dto.CartDTO;
@@ -30,6 +33,9 @@ public class UserController {
 
 	@Autowired
 	SellerService sellerService;
+
+	@Value("${product.uri}")
+	String productUri;
 
 	// Register the Buyer
 	@PostMapping(value = "/userMS/buyer/register")
@@ -85,22 +91,21 @@ public class UserController {
 			throws UserMSException {
 		try {
 			/*
-			 * Here we will use rest template to fetch the product from ProductMS and from
-			 * that product we will fetch the product id if product is not found then we
-			 * will throw an exception which is commented below for now. for example:-
-			 * ProductDTO product = new
-			 * RestTemplate().getForObject(prodUri+"/prodMS/getById/"+prodId,
-			 * ProductDTO.class);
+			 * Here we are using rest template to fetch the productDTO from ProductMS, and from
+			 * that productDTO we will fetch the product id. If product is not found then we
+			 * are throwing an exception 
 			 */
-			String result = buyerService.addToWishlist(prodId, buyerId);
+			ProductDTO productDTO = new RestTemplate().getForObject(productUri + "product/get/Id/" + prodId,
+					ProductDTO.class);
+			String result = buyerService.addToWishlist(productDTO.getProdId(), buyerId);
 			return new ResponseEntity<>(result, HttpStatus.ACCEPTED);
-		} catch (Exception e) {
-//			String newMsg = "Product invalid or Product already in wishlist";
-//			if (e.getMessage().equals("404 null")) {
-//				newMsg = "Product is unavailable or product id is invalid";
-//			}
-//			throw new ResponseStatusException(HttpStatus.NOT_FOUND, newMsg, e);
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+		}catch(HttpClientErrorException e) {
+		    String errorMsg = "Product is unavailable or product id is invalid";
+		    return new ResponseEntity<String>(errorMsg, HttpStatus.BAD_REQUEST);
+			
+		}catch(Exception e) {
+			String errorMsg = e.getMessage();
+			return new ResponseEntity<String>(errorMsg, HttpStatus.BAD_REQUEST);
 		}
 	}
 
@@ -303,5 +308,11 @@ public class UserController {
 //		return true;
 //
 //	}
+
+	// get reward points for specific user
+	@GetMapping(value = "/userMS/get/rewardPoints/{buyerId}")
+	public Integer getRewardPoints(@PathVariable String buyerId) {
+		return buyerService.getRewardPoints(buyerId);
+	}
 
 }
