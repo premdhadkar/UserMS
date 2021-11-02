@@ -97,11 +97,6 @@ public class UserController {
 	public ResponseEntity<String> addToWishlist(@PathVariable String buyerId, @PathVariable String prodId)
 			throws UserMSException {
 		try {
-			/*
-			 * Here we are using rest template to fetch the productDTO from ProductMS, and
-			 * from that productDTO we will fetch the product id. If product is not found
-			 * then we are throwing an exception
-			 */
 			ProductDTO productDTO = new RestTemplate().getForObject(productUri + "product/get/Id/" + prodId,
 					ProductDTO.class);
 			String result = buyerService.addToWishlist(productDTO.getProdId(), buyerId);
@@ -220,11 +215,6 @@ public class UserController {
 	public ResponseEntity<String> moveWishlistToCart(@PathVariable String buyerId, @PathVariable String prodId,
 			@PathVariable Integer quantity) {
 		try {
-			/*
-			 * Here we are using rest template to fetch the productDTO from ProductMS, and
-			 * from that productDTO we will fetch the product id. If product is not found
-			 * then we are throwing an exception
-			 */
 			ProductDTO productDTO = new RestTemplate().getForObject(productUri + "product/get/Id/" + prodId,
 					ProductDTO.class);
 			if (productDTO.getStock() < quantity)
@@ -300,22 +290,16 @@ public class UserController {
 		return null;
 	}
 
-	@DeleteMapping(value = "/seller/products/delete/{prodId}")
-	public ResponseEntity<String> deleteProduct(@PathVariable Integer prodId) {
+	@GetMapping(value = "/seller/products/delete/{prodId}")
+	public ResponseEntity<String> deleteProduct(@PathVariable String prodId) {
 		try {
-			/*
-			 * Here we will use rest template to fetch the product from ProductMS and from
-			 * that product we will fetch the product id if product is not found then we
-			 * will throw an exception which is commented below for now. for example:-
-			 * ProductDTO product = new
-			 * RestTemplate().getForObject(prodUri+"/prodMS/getById/"+prodId,
-			 * ProductDTO.class);
-			 */
-			// new RestTemplate().delete(productUri+"delete/"+prodId);
+			new RestTemplate().delete(productUri + "product/delete/" + prodId);
+
 			String response = "Deleted Successfully";
 			return new ResponseEntity<String>(response, HttpStatus.NOT_FOUND);
-		} catch (Exception e) {
-			return new ResponseEntity<String>(e.getMessage(), HttpStatus.NOT_FOUND);
+		} catch (HttpClientErrorException e) {
+			String errorMsg = "Product is unavailable or product id is invalid";
+			return new ResponseEntity<String>(errorMsg, HttpStatus.BAD_REQUEST);
 		}
 	}
 
