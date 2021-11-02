@@ -27,6 +27,7 @@ import com.team21.dto.SellerDTO;
 import com.team21.exception.UserMSException;
 import com.team21.service.BuyerService;
 import com.team21.service.SellerService;
+import com.team21.utility.CurrentOrderStatus;
 
 @RestController
 public class UserController {
@@ -350,6 +351,20 @@ public class UserController {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Buyer NOT found", e);
 		}
 
+	}
+
+	@GetMapping(value = "/userMS/seller/order/status/update/{orderId}/{status}")
+	public ResponseEntity<String> orderStatusUpdate(@PathVariable String orderId,
+			@PathVariable CurrentOrderStatus status) throws UserMSException {
+		try {
+			String result = new RestTemplate().postForObject(orderUri + "order/status/update/" + orderId + "/" + status,
+					null, String.class);
+			return new ResponseEntity<String>(result, HttpStatus.OK);
+		} catch (HttpClientErrorException e) {
+
+			return new ResponseEntity<String>(e.getMessage(), HttpStatus.NOT_FOUND);
+
+		}
 	}
 
 }
