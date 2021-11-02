@@ -31,6 +31,8 @@ public interface BuyerService {
 
 	public void addRewardPoints(String buyerId, double amount);
 
-	public Integer getRewardPoints(String buyerId);
+	public Integer getRewardPoints(String buyerId) throws UserMSException;
+
+	public void updateRewardPoints(String buyerId);
 
 }

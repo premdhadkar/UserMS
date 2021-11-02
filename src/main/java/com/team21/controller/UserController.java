@@ -1,5 +1,6 @@
 package com.team21.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,10 +16,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.team21.dto.BuyerDTO;
 import com.team21.dto.CartDTO;
 import com.team21.dto.LoginDTO;
+import com.team21.dto.OrderDTO;
 import com.team21.dto.ProductDTO;
 import com.team21.dto.SellerDTO;
 import com.team21.exception.UserMSException;
@@ -36,6 +39,9 @@ public class UserController {
 
 	@Value("${product.uri}")
 	String productUri;
+
+	@Value("${order.uri}")
+	String orderUri;
 
 	// Register the Buyer
 	@PostMapping(value = "/userMS/buyer/register")
@@ -146,6 +152,36 @@ public class UserController {
 		} catch (UserMSException e) {
 
 			return new ResponseEntity(e.getMessage(), HttpStatus.NOT_FOUND);
+		}
+	}
+
+	@GetMapping(value = "/cart/product/{buyerId}", produces = MediaType.APPLICATION_JSON_VALUE)
+	public List<String> getProductIdListFromCart(@PathVariable String buyerId) {
+		try {
+			List<CartDTO> listCart = buyerService.getCart(buyerId);
+			List<String> productList = new ArrayList<>();
+			for (CartDTO cart : listCart) {
+				productList.add(cart.getProdId());
+			}
+			return productList;
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e);
+		}
+	}
+
+	// Get Quantity from cart by giving buyerId and product ID
+	@GetMapping(value = "/cart/product/quantity/{buyerId}/{prodId}", produces = MediaType.APPLICATION_JSON_VALUE)
+	public Integer getQuantityFromCart(@PathVariable String buyerId, @PathVariable String prodId)
+			throws UserMSException {
+		try {
+			List<CartDTO> listCart = buyerService.getCart(buyerId);
+			for (CartDTO cart : listCart) {
+				if (cart.getProdId().equals(prodId))
+					return cart.getQuantity();
+			}
+			return 0;
+		} catch (UserMSException e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e);
 		}
 	}
 
@@ -282,22 +318,38 @@ public class UserController {
 		}
 	}
 
-//	@PostMapping(value = "/userMS/buyer/order", consumes = MediaType.APPLICATION_JSON_VALUE)
-//	public boolean orderUpdate(@RequestBody OrderDetailsDTO orderDetails) {
-//		buyerService.addRewardPoints(orderDetails.getBuyerId(), orderDetails.getAmount());
-//
-//		List<ProductsOrderedDTO> productsOrdered = orderDetails.getProductsOrdered();
-//
-//		new RestTemplate().postForObject(productUri + "/reduceStock", productsOrdered, Boolean.class);
-//
-//		return true;
-//
-//	}
+	// after discount add additional reward points
+	@PostMapping(value = "/userMS/updateRewards/{buyerId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+	public boolean orderUpdate(@RequestBody Float amount, @PathVariable String buyerId) {
+		buyerService.updateRewardPoints(buyerId);
+		buyerService.addRewardPoints(buyerId, amount);
+		return true;
+
+	}
+
+	// checkout cart products for final order
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@PostMapping(value = "/userMS/cart/checkout", consumes = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<String> checkout(@RequestBody OrderDTO orderDTO) {
+		try {
+			String result = new RestTemplate().postForObject(orderUri + "order/place", orderDTO, String.class);
+			return new ResponseEntity<String>(result, HttpStatus.ACCEPTED);
+		} catch (HttpClientErrorException e) {
+
+			return new ResponseEntity(e.getMessage(), HttpStatus.NOT_ACCEPTABLE);
+		}
+	}
 
 	// get reward points for specific user
 	@GetMapping(value = "/userMS/get/rewardPoints/{buyerId}")
-	public Integer getRewardPoints(@PathVariable String buyerId) {
-		return buyerService.getRewardPoints(buyerId);
+	public Integer getRewardPoints(@PathVariable String buyerId) throws UserMSException {
+
+		try {
+			return buyerService.getRewardPoints(buyerId);
+		} catch (UserMSException e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Buyer NOT found", e);
+		}
+
 	}
 
 }

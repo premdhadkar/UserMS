@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import com.team21.dto.BuyerDTO;
 import com.team21.dto.CartDTO;
 import com.team21.dto.LoginDTO;
+import com.team21.dto.OrderDTO;
 import com.team21.entity.BuyerEntity;
 import com.team21.entity.CartEntity;
 import com.team21.entity.WishlistEntity;
@@ -100,6 +101,7 @@ public class BuyerServiceImpl implements BuyerService {
 		return "Logged in Successfully";
 	}
 
+	// Get details of specific buyer by giving buyer ID
 	@Override
 	public BuyerDTO getSepcificBuyer(String buyerId) throws UserMSException {
 
@@ -204,6 +206,11 @@ public class BuyerServiceImpl implements BuyerService {
 	// Get List of Cart Items
 	@Override
 	public List<CartDTO> getCart(String id) throws UserMSException {
+		Optional<BuyerEntity> optionalBuyerEntity = buyerRepository.findById(id);
+
+		if (!optionalBuyerEntity.isPresent())
+			throw new UserMSException("Buyer does not exist");
+
 		List<CartEntity> listOfProdsWithQty = cartRepository.findByCompoundKeyBuyerId(id);
 
 		if (listOfProdsWithQty.isEmpty())
@@ -244,7 +251,7 @@ public class BuyerServiceImpl implements BuyerService {
 		Optional<BuyerEntity> optional = buyerRepository.findById(buyerId);
 		if (optional.isPresent() == true) {
 			int rewardPoints = optional.get().getRewardPoints();
-			int finalRewardPoints = rewardPoints + +((int) amount / 100);
+			int finalRewardPoints = rewardPoints + ((int) amount / 100);
 			optional.get().setRewardPoints(finalRewardPoints);
 			if (finalRewardPoints >= 10000) {
 				optional.get().setIsPrivileged("True");
@@ -253,14 +260,25 @@ public class BuyerServiceImpl implements BuyerService {
 		}
 	}
 
+	// calculate and store remaining reward points after discount
+	@Override
+	public void updateRewardPoints(String buyerId) {
+		Optional<BuyerEntity> optional = buyerRepository.findById(buyerId);
+		if (optional.isPresent()) {
+			BuyerEntity buyerEntity = optional.get();
+			buyerEntity.setRewardPoints(buyerEntity.getRewardPoints() % 4);
+			buyerRepository.save(buyerEntity);
+		}
+	}
+
 	// get reward points for specific user
 	@Override
-	public Integer getRewardPoints(String buyerId) {
+	public Integer getRewardPoints(String buyerId) throws UserMSException {
 		Optional<BuyerEntity> optional = buyerRepository.findById(buyerId);
 		if (optional.isPresent()) {
 			return optional.get().getRewardPoints();
 		} else
-			return 0;
+			throw new UserMSException("Buyer does not exist");
 	}
 
 	// Remove products from Cart
