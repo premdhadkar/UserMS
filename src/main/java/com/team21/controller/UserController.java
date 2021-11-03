@@ -194,6 +194,7 @@ public class UserController {
 			return new ResponseEntity(e.getMessage(), HttpStatus.NOT_FOUND);
 		}
 	}
+
 	// get order history of particular Buyer
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@GetMapping(value = "userMS/buyer/orderHistory/{buyerId}")
@@ -287,6 +288,17 @@ public class UserController {
 		} catch (UserMSException e) {
 			String errorMsg = e.getMessage();
 			return new ResponseEntity<String>(errorMsg, HttpStatus.BAD_REQUEST);
+		}
+	}
+
+	// Re-Order from previous order
+	@PostMapping(value = "/userMS/buyer/reOrder/{orderId}")
+	public ResponseEntity<String> reOrder(@PathVariable String orderId) {
+		try {
+			String result = new RestTemplate().postForObject(orderUri + "order/reOrder/" + orderId, null, String.class);
+			return new ResponseEntity<String>(result, HttpStatus.OK);
+		} catch (HttpClientErrorException e) {
+			return new ResponseEntity<String>(e.getMessage(), HttpStatus.NOT_FOUND);
 		}
 	}
 
