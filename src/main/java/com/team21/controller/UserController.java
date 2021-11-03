@@ -290,22 +290,12 @@ public class UserController {
 	@PostMapping(value = "/seller/products/add", consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> addProduct(@RequestBody ProductDTO productDTO) {
 		try {
-			/*
-			 * Here we will use rest template to fetch the product from ProductMS and from
-			 * that product we will fetch the product id if product is not found then we
-			 * will throw an exception which is commented below for now. for example:-
-			 * ProductDTO product = new
-			 * RestTemplate().getForObject(prodUri+"/prodMS/getById/"+prodId,
-			 * ProductDTO.class);
-			 */
-
-			// String response = new RestTemplate().postForObject(productUri, productDTO,
-			// String.class);
-			// return response;
-		} catch (Exception e) {
-			return new ResponseEntity<String>(e.getMessage(), HttpStatus.NOT_FOUND);
+			String result = new RestTemplate().postForObject(productUri + "product/add", productDTO, String.class);
+			String response = "Your product is successfully added with product ID: " + result;
+			return new ResponseEntity<String>(response, HttpStatus.CREATED);
+		} catch (HttpClientErrorException e) {
+			return new ResponseEntity<String>(e.getMessage(), HttpStatus.ALREADY_REPORTED);
 		}
-		return null;
 	}
 
 	@GetMapping(value = "/seller/products/delete/{prodId}")
