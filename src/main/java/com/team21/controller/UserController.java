@@ -84,13 +84,13 @@ public class UserController {
 
 	// Seller will be able to view orders placed on their products
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@GetMapping(value = "/userMS/seller/view/soldProducts/{sellerId}/{prodId}")
+	@GetMapping(value = "/userMS/seller/view/soldProducts/{sellerId}/{productId}")
 	public ResponseEntity<List<ProductOrderedDTO>> getSellerProducts(@PathVariable String sellerId,
 			@PathVariable String productId) {
 		try {
 
 			List<ProductOrderedDTO> productOrdered = new RestTemplate()
-					.getForObject(orderUri + "view/bySellersProducts" + sellerId + productId, List.class);
+					.getForObject(orderUri + "order/view/bySellersProducts/" + sellerId+ "/"+ productId, List.class);
 			return new ResponseEntity<List<ProductOrderedDTO>>(productOrdered, HttpStatus.OK);
 
 		} catch (Exception e) {
