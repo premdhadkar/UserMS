@@ -321,6 +321,18 @@ public class UserController {
 
 	}
 
+	@PutMapping(value = "/userMS/seller/update/stock/{productId}/{quantity}")
+	public ResponseEntity<String> updateStockBYSeller(@PathVariable String productId, @PathVariable Integer quantity)
+			throws UserMSException {
+		try {
+			new RestTemplate().put(productUri + "product/update/stock/" + productId + "/" + quantity, null);
+			String result = "Stock Updated Successfully with productId-: " + productId + " and quantity: " + quantity;
+			return new ResponseEntity<String>(result, HttpStatus.OK);
+		} catch (HttpClientErrorException e) {
+			return new ResponseEntity<String>(e.getMessage(), HttpStatus.NOT_ACCEPTABLE);
+		}
+	}
+
 	// checkout cart products for final order
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@PostMapping(value = "/userMS/cart/checkout", consumes = MediaType.APPLICATION_JSON_VALUE)
