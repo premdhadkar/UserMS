@@ -70,6 +70,7 @@ public class UserController {
 		}
 	}
 
+	// get all details of specific buyer
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@GetMapping(value = "/userMS/buyer/{buyerId}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<BuyerDTO> getSepcificBuyerDetails(@PathVariable String buyerId) {
@@ -110,6 +111,7 @@ public class UserController {
 		}
 	}
 
+	// view products by name by Visitory
 	@GetMapping(value = "userMS/buyer/view/products/byName/{productName}")
 	public ResponseEntity<ProductDTO> viewProductsByName(@PathVariable String productName) {
 		try {
@@ -121,6 +123,7 @@ public class UserController {
 		}
 	}
 
+	// view list of all the products by cateory by Visitory
 	@GetMapping(value = "userMS/buyer/view/products/byCategory/{categoryName}")
 	public ResponseEntity<List<ProductDTO>> viewProductsByCategory(@PathVariable String categoryName) {
 		try {
@@ -192,6 +195,7 @@ public class UserController {
 		}
 	}
 
+	// get product id list from buyer's cart
 	@GetMapping(value = "/cart/product/{buyerId}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public List<String> getProductIdListFromCart(@PathVariable String buyerId) {
 		try {
@@ -298,9 +302,9 @@ public class UserController {
 		}
 	}
 
-	// Delete seller
+	// Deactivate seller account and delete all his products
 	@DeleteMapping(value = "/userMS/seller/deregister/{sellerId}")
-	public ResponseEntity<String> deleteSellerAccount(@PathVariable String sellerId) {
+	public ResponseEntity<String> deactivateSellerAccount(@PathVariable String sellerId) {
 
 		try {
 			String msg = sellerService.deleteSeller(sellerId);
@@ -311,6 +315,7 @@ public class UserController {
 		}
 	}
 
+	// Seller can add the products
 	@PostMapping(value = "/seller/products/add", consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> addProduct(@RequestBody ProductDTO productDTO) {
 		try {
@@ -322,6 +327,7 @@ public class UserController {
 		}
 	}
 
+	// seller can delete his products
 	@GetMapping(value = "/seller/products/delete/{prodId}")
 	public ResponseEntity<String> deleteProduct(@PathVariable String prodId) {
 		try {
@@ -381,6 +387,7 @@ public class UserController {
 
 	}
 
+	// update status of placed orders
 	@GetMapping(value = "/userMS/seller/order/status/update/{orderId}/{status}")
 	public ResponseEntity<String> orderStatusUpdate(@PathVariable String orderId,
 			@PathVariable CurrentOrderStatus status) throws UserMSException {
