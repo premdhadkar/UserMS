@@ -168,6 +168,19 @@ public class UserController {
 			return new ResponseEntity(e.getMessage(), HttpStatus.NOT_FOUND);
 		}
 	}
+	// get order history of particular Buyer
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@GetMapping(value = "userMS/buyer/orderHistory/{buyerId}")
+	public ResponseEntity<List<OrderDTO>> getOrderHistoryOfBuyer(@PathVariable String buyerId) throws UserMSException {
+		try {
+
+			List<OrderDTO> orders = new RestTemplate().getForObject(orderUri + "order/view/byBuyerId/" + buyerId,
+					List.class);
+			return new ResponseEntity<>(orders, HttpStatus.OK);
+		} catch (HttpClientErrorException e) {
+			return new ResponseEntity(e.getMessage(), HttpStatus.NOT_FOUND);
+		}
+	}
 
 	@GetMapping(value = "/cart/product/{buyerId}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public List<String> getProductIdListFromCart(@PathVariable String buyerId) {
