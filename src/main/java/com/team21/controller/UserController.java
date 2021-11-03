@@ -110,6 +110,29 @@ public class UserController {
 		}
 	}
 
+	@GetMapping(value = "userMS/buyer/view/products/byName/{productName}")
+	public ResponseEntity<ProductDTO> viewProductsByName(@PathVariable String productName) {
+		try {
+			ProductDTO productDTO = new RestTemplate().getForObject(productUri + "product/get/name/" + productName,
+					ProductDTO.class);
+			return new ResponseEntity<ProductDTO>(productDTO, HttpStatus.OK);
+		} catch (HttpClientErrorException e) {
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
+		}
+	}
+
+	@GetMapping(value = "userMS/buyer/view/products/byCategory/{categoryName}")
+	public ResponseEntity<List<ProductDTO>> viewProductsByCategory(@PathVariable String categoryName) {
+		try {
+			@SuppressWarnings("unchecked")
+			List<ProductDTO> productDTOList = new RestTemplate()
+					.getForObject(productUri + "product/get/category/" + categoryName, List.class);
+			return new ResponseEntity<List<ProductDTO>>(productDTOList, HttpStatus.OK);
+		} catch (HttpClientErrorException e) {
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
+		}
+	}
+
 	// Add Product to Buyer's WishList
 	@PostMapping(value = "/userMS/buyer/wishlist/add/{buyerId}/{prodId}")
 	public ResponseEntity<String> addToWishlist(@PathVariable String buyerId, @PathVariable String prodId)
