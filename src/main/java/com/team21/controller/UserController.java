@@ -90,7 +90,7 @@ public class UserController {
 		try {
 
 			List<ProductOrderedDTO> productOrdered = new RestTemplate()
-					.getForObject(orderUri + "order/view/bySellersProducts/" + sellerId+ "/"+ productId, List.class);
+					.getForObject(orderUri + "order/view/bySellersProducts/" + sellerId + "/" + productId, List.class);
 			return new ResponseEntity<List<ProductOrderedDTO>>(productOrdered, HttpStatus.OK);
 
 		} catch (Exception e) {
@@ -275,11 +275,12 @@ public class UserController {
 	}
 
 	// Delete seller
-	@DeleteMapping(value = "/userMS/seller/deregister/{id}")
-	public ResponseEntity<String> deleteSellerAccount(@PathVariable String id) {
+	@DeleteMapping(value = "/userMS/seller/deregister/{sellerId}")
+	public ResponseEntity<String> deleteSellerAccount(@PathVariable String sellerId) {
 
 		try {
-			String msg = sellerService.deleteSeller(id);
+			String msg = sellerService.deleteSeller(sellerId);
+			new RestTemplate().delete(productUri + "product/deleteAll/" + sellerId);
 			return new ResponseEntity<>(msg, HttpStatus.OK);
 		} catch (UserMSException e) {
 			return new ResponseEntity<String>(e.getMessage(), HttpStatus.NOT_FOUND);

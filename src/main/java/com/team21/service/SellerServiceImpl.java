@@ -83,16 +83,18 @@ public class SellerServiceImpl implements SellerService {
 
 	// Delete Seller
 	@Override
-	public String deleteSeller(String id) throws UserMSException {
+	public String deleteSeller(String sellerId) throws UserMSException {
 
-		SellerEntity seller = sellerRepository.findBySellerId(id);
+		SellerEntity seller = sellerRepository.findBySellerId(sellerId);
 
 		if (seller == null)
-			throw new UserMSException("Seller does not exist!");
+			throw new UserMSException("Seller is not registered!");
 
-		sellerRepository.delete(seller);
+		seller.setIsActive("False");
 
-		return "Account deleted successfully!";
+		sellerRepository.save(seller);
+
+		return "Account Deactivation successfull!";
 	}
 
 }
