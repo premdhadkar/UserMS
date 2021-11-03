@@ -23,6 +23,7 @@ import com.team21.dto.CartDTO;
 import com.team21.dto.LoginDTO;
 import com.team21.dto.OrderDTO;
 import com.team21.dto.ProductDTO;
+import com.team21.dto.ProductOrderedDTO;
 import com.team21.dto.SellerDTO;
 import com.team21.exception.UserMSException;
 import com.team21.service.BuyerService;
@@ -79,6 +80,22 @@ public class UserController {
 			return new ResponseEntity(e.getMessage(), HttpStatus.NOT_FOUND);
 		}
 
+	}
+
+	// Seller will be able to view orders placed on their products
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@GetMapping(value = "/userMS/seller/view/soldProducts/{sellerId}/{prodId}")
+	public ResponseEntity<List<ProductOrderedDTO>> getSellerProducts(@PathVariable String sellerId,
+			@PathVariable String productId) {
+		try {
+
+			List<ProductOrderedDTO> productOrdered = new RestTemplate()
+					.getForObject(orderUri + "view/bySellersProducts" + sellerId + productId, List.class);
+			return new ResponseEntity<List<ProductOrderedDTO>>(productOrdered, HttpStatus.OK);
+
+		} catch (Exception e) {
+			return new ResponseEntity(e.getMessage(), HttpStatus.NOT_FOUND);
+		}
 	}
 
 	// Delete Buyer
