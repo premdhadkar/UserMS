@@ -309,4 +309,14 @@ public class BuyerServiceImpl implements BuyerService {
 
 	}
 
+	@Override
+	public boolean isCartEmpty(String buyerId) throws UserMSException {
+		List<CartEntity> cartDTOs = cartRepository.findByCompoundKeyBuyerId(buyerId);
+
+		if (cartDTOs.isEmpty())
+			throw new UserMSException("Cannot place Order: your cart is empty");
+
+		return false;
+	}
+
 }
