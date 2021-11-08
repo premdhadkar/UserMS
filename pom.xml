@@ -9,6 +9,7 @@
 		<version>2.5.6</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
+
 	<groupId>com.team21</groupId>
 	<artifactId>UserMS</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
@@ -16,7 +17,13 @@
 	<description>User MS for Project</description>
 	<properties>
 		<java.version>11</java.version>
+
+
+		<sonar.organization>ritika0912</sonar.organization>
+		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
+
 	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
