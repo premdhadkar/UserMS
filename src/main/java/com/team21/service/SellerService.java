@@ -12,4 +12,5 @@ public interface SellerService {
 
 	public String deleteSeller(String id) throws UserMSException;
 
+	public boolean isSellerPresent(String sellerId) throws UserMSException;
 }

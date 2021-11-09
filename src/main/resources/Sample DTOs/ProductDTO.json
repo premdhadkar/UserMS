@@ -1,0 +1,24 @@
+[
+	{
+		"productName": "Bottle",
+		"price": 200.50,
+		"stock": 45,
+		"description": "A Transparent bottle of red color",
+		"image": "RedBottle.jpeg",
+		"category": "500 ml bottle",
+		"sellerId": "SELL101",
+		"subCategory": "Red Color",
+		"productRating": 6.5
+	},
+	{
+		"productName": "Spoon",
+		"price": 501.50,
+		"stock": 12,
+		"description": "A sliver spoon",
+		"image": "silverSpoon.jpeg",
+		"category": "Silver Item",
+		"sellerId": "SELL101",
+		"subCategory": "Utensils",
+		"productRating": 8.5
+	}
+]

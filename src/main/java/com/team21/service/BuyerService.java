@@ -35,4 +35,6 @@ public interface BuyerService {
 
 	public void updateRewardPoints(String buyerId);
 
+	boolean isCartEmpty(String buyerId) throws UserMSException;
+
 }

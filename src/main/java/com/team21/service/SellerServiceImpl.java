@@ -32,7 +32,7 @@ public class SellerServiceImpl implements SellerService {
 
 		// using Demorgan's Law in programming logic
 		if (!(sellerByEmail == null && sellerByPhoneNumber == null))
-			throw new UserMSException("Seller already exist");
+			throw new UserMSException("Service.SELLER_ALREADY_EXIST");
 
 		UserValidator.validateSeller(sellerDTO);
 
@@ -59,15 +59,15 @@ public class SellerServiceImpl implements SellerService {
 		String password = loginDTO.getPassword();
 
 		if (!UserValidator.validateEmail(email))
-			throw new UserMSException("You have entered wrong emailid!");
+			throw new UserMSException("Service.INVALID_EMAIL_ADDRESS");
 
 		SellerEntity seller = sellerRepository.findByEmail(email);
 
 		if (seller == null)
-			throw new UserMSException("Seller does not exist!");
+			throw new UserMSException("Service.SELLER_DOES_NOT_EXIST");
 
 		if (!seller.getPassword().equals(password))
-			throw new UserMSException("Wrong credentials!");
+			throw new UserMSException("Service.WRONG_CREDENTIALS");
 
 		seller.setIsActive("True");
 
@@ -83,13 +83,20 @@ public class SellerServiceImpl implements SellerService {
 		SellerEntity seller = sellerRepository.findBySellerId(sellerId);
 
 		if (seller == null)
-			throw new UserMSException("Seller is not registered!");
+			throw new UserMSException("Service.SELLER_DOES_NOT_EXIST");
 
 		seller.setIsActive("False");
 
 		sellerRepository.save(seller);
 
 		return "Account Deactivation successfull!";
+	}
+
+	@Override
+	public boolean isSellerPresent(String sellerId) throws UserMSException {
+		if (!sellerRepository.findById(sellerId).isPresent())
+			throw new UserMSException("Service.SELLER_DOES_NOT_EXIST");
+		return true;
 	}
 
 }

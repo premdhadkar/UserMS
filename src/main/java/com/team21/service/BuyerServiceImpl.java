@@ -27,6 +27,8 @@ import com.team21.validator.UserValidator;
 public class BuyerServiceImpl implements BuyerService {
 
 	private static final String BUYER_DOES_NOT_EXIST = "Buyer does not exist";
+	private static final String SERVICE_BUYER_DOES_NOT_EXIST = "Service.BUYER_DOES_NOT_EXIST";
+
 	// To maintain Buyer's Id in sequential manner
 	private static int buyerCount = 100;
 
@@ -50,7 +52,7 @@ public class BuyerServiceImpl implements BuyerService {
 
 		// using Demorgan's Law in programming logic
 		if (!(buyerByEmail == null && buyerByPhoneNumber == null))
-			throw new UserMSException(BUYER_DOES_NOT_EXIST);
+			throw new UserMSException("Service.BUYER_ALREADY_EXIST");
 
 		UserValidator.validateBuyer(buyerDTO);
 
@@ -80,15 +82,15 @@ public class BuyerServiceImpl implements BuyerService {
 		String password = loginDTO.getPassword();
 
 		if (!UserValidator.validateEmail(email))
-			throw new UserMSException("You have entered wrong EmailId!");
+			throw new UserMSException("Service.INVALID_EMAIL_ADDRESS");
 
 		BuyerEntity buyer = buyerRepository.findByEmail(email);
 
 		if (buyer == null)
-			throw new UserMSException(BUYER_DOES_NOT_EXIST);
+			throw new UserMSException(SERVICE_BUYER_DOES_NOT_EXIST);
 
 		if (!buyer.getPassword().equals(password))
-			throw new UserMSException("Wrong credentials");
+			throw new UserMSException("Service.WRONG_CREDENTIALS");
 
 		buyer.setIsActive("True");
 
@@ -117,7 +119,7 @@ public class BuyerServiceImpl implements BuyerService {
 			buyerDTO.setRewardPoints(buyer.getRewardPoints());
 
 		} else
-			throw new UserMSException("No such buyer found");
+			throw new UserMSException(SERVICE_BUYER_DOES_NOT_EXIST);
 
 		return buyerDTO;
 	}
@@ -129,7 +131,7 @@ public class BuyerServiceImpl implements BuyerService {
 		BuyerEntity buyer = buyerRepository.findByBuyerId(id);
 
 		if (buyer == null)
-			throw new UserMSException(BUYER_DOES_NOT_EXIST);
+			throw new UserMSException(SERVICE_BUYER_DOES_NOT_EXIST);
 
 		buyerRepository.delete(buyer);
 
@@ -147,10 +149,10 @@ public class BuyerServiceImpl implements BuyerService {
 		Optional<BuyerEntity> optionalBuyerEntity = buyerRepository.findById(buyerId);
 
 		if (!optionalBuyerEntity.isPresent())
-			throw new UserMSException(BUYER_DOES_NOT_EXIST);
+			throw new UserMSException(SERVICE_BUYER_DOES_NOT_EXIST);
 
 		if (optionalWishlistEntity.isPresent())
-			throw new UserMSException("Product already present in Wishlist");
+			throw new UserMSException("Service.PRODUCT_ALREADY_EXISTS");
 
 		WishlistEntity newWish = new WishlistEntity();
 
@@ -167,7 +169,7 @@ public class BuyerServiceImpl implements BuyerService {
 		Optional<BuyerEntity> optionalBuyerEntity = buyerRepository.findById(buyerId);
 
 		if (!optionalBuyerEntity.isPresent())
-			throw new UserMSException(BUYER_DOES_NOT_EXIST);
+			throw new UserMSException(SERVICE_BUYER_DOES_NOT_EXIST);
 
 		// if quantity to be added is zero
 		if (quantity == 0)
@@ -205,12 +207,12 @@ public class BuyerServiceImpl implements BuyerService {
 		Optional<BuyerEntity> optionalBuyerEntity = buyerRepository.findById(id);
 
 		if (!optionalBuyerEntity.isPresent())
-			throw new UserMSException(BUYER_DOES_NOT_EXIST);
+			throw new UserMSException(SERVICE_BUYER_DOES_NOT_EXIST);
 
 		List<CartEntity> listOfProdsWithQty = cartRepository.findByCompoundKeyBuyerId(id);
 
 		if (listOfProdsWithQty.isEmpty())
-			throw new UserMSException("Cart is Empty");
+			throw new UserMSException("Service.CART_EMPTY");
 
 		List<CartDTO> cartDTOs = new ArrayList<>();
 
@@ -283,7 +285,7 @@ public class BuyerServiceImpl implements BuyerService {
 		WishlistEntity wishlistItem = wishlistRepository.findByCompoundIdBuyerIdAndCompoundIdProdId(buyerId, prodId);
 
 		if (wishlistItem == null)
-			throw new UserMSException("Item not found in your wishlist!");
+			throw new UserMSException("PRODUCT_NOT_IN_WISTLIST");
 
 		wishlistRepository.deleteByCompoundIdBuyerIdAndCompoundIdProdId(buyerId, prodId);
 
@@ -303,4 +305,15 @@ public class BuyerServiceImpl implements BuyerService {
 
 	}
 
+	@Override
+	public boolean isCartEmpty(String buyerId) throws UserMSException {
+		Optional<BuyerEntity> optionalBuyerEntity = buyerRepository.findById(buyerId);
+
+		if (!optionalBuyerEntity.isPresent())
+			throw new UserMSException(SERVICE_BUYER_DOES_NOT_EXIST);
+
+		List<CartEntity> cartDTOs = cartRepository.findByCompoundKeyBuyerId(buyerId);
+
+		return cartDTOs.isEmpty();
+	}
 }

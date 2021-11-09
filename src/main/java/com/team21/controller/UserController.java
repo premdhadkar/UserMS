@@ -35,6 +35,8 @@ import com.team21.utility.CurrentOrderStatus;
 @RestController
 public class UserController {
 
+	private static final String PRODUCT_DOES_NOT_EXISTS = "PRODUCT_DOES_NOT_EXISTS";
+	private static final String PRODUCT_INVALID_UNAVAILABLE = "";
 	@Autowired
 	Environment environment;
 
@@ -58,8 +60,7 @@ public class UserController {
 			String result = "Buyer registered successfully with buyer Id : " + buyerService.buyerRegistration(buyerDto);
 			return new ResponseEntity<>(result, HttpStatus.OK);
 		} catch (UserMSException e) {
-			String errorMsg = e.getMessage();
-			return new ResponseEntity<>(errorMsg, HttpStatus.EXPECTATION_FAILED);
+			return new ResponseEntity<>(environment.getProperty(e.getMessage()), HttpStatus.EXPECTATION_FAILED);
 		}
 	}
 
@@ -70,7 +71,7 @@ public class UserController {
 			String msg = buyerService.buyerLogin(loginDTO);
 			return new ResponseEntity<>(msg, HttpStatus.OK);
 		} catch (UserMSException e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(environment.getProperty(e.getMessage()), HttpStatus.NOT_FOUND);
 		}
 	}
 
@@ -82,8 +83,8 @@ public class UserController {
 			BuyerDTO buyerDTO = buyerService.getSepcificBuyer(buyerId);
 			return new ResponseEntity<>(buyerDTO, HttpStatus.OK);
 
-		} catch (Exception e) {
-			return new ResponseEntity(e.getMessage(), HttpStatus.NOT_FOUND);
+		} catch (UserMSException e) {
+			return new ResponseEntity(environment.getProperty(e.getMessage()), HttpStatus.NOT_FOUND);
 		}
 
 	}
@@ -94,13 +95,16 @@ public class UserController {
 	public ResponseEntity<List<ProductOrderedDTO>> getSellerProducts(@PathVariable String sellerId,
 			@PathVariable String productId) {
 		try {
-
+			sellerService.isSellerPresent(sellerId);
 			List<ProductOrderedDTO> productOrdered = new RestTemplate()
 					.getForObject(orderUri + "order/view/bySellersProducts/" + sellerId + "/" + productId, List.class);
 			return new ResponseEntity<>(productOrdered, HttpStatus.OK);
 
+		} catch (HttpClientErrorException e) {
+			String response = "No Order details for this product";
+			return new ResponseEntity(response, HttpStatus.NOT_FOUND);
 		} catch (Exception e) {
-			return new ResponseEntity(e.getMessage(), HttpStatus.NOT_FOUND);
+			return new ResponseEntity(environment.getProperty(e.getMessage()), HttpStatus.NOT_FOUND);
 		}
 	}
 
@@ -111,11 +115,12 @@ public class UserController {
 			String result = buyerService.deleteBuyer(id);
 			return new ResponseEntity<>(result, HttpStatus.OK);
 		} catch (UserMSException e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(environment.getProperty(e.getMessage()), HttpStatus.NOT_FOUND);
 		}
 	}
 
-	// view products by name by Visitory
+	// view products by name by Visitor
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@GetMapping(value = "userMS/buyer/view/products/byName/{productName}")
 	public ResponseEntity<ProductDTO> viewProductsByName(@PathVariable String productName) {
 		try {
@@ -123,20 +128,20 @@ public class UserController {
 					ProductDTO.class);
 			return new ResponseEntity<>(productDTO, HttpStatus.OK);
 		} catch (HttpClientErrorException e) {
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
+			return new ResponseEntity(environment.getProperty(PRODUCT_DOES_NOT_EXISTS), HttpStatus.NOT_FOUND);
 		}
 	}
 
-	// view list of all the products by cateory by Visitory
+	// view list of all the products by category by Visitor
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@GetMapping(value = "userMS/buyer/view/products/byCategory/{categoryName}")
 	public ResponseEntity<List<ProductDTO>> viewProductsByCategory(@PathVariable String categoryName) {
 		try {
-			@SuppressWarnings("unchecked")
 			List<ProductDTO> productDTOList = new RestTemplate()
 					.getForObject(productUri + "product/get/category/" + categoryName, List.class);
 			return new ResponseEntity<>(productDTOList, HttpStatus.OK);
 		} catch (HttpClientErrorException e) {
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
+			return new ResponseEntity(environment.getProperty(PRODUCT_DOES_NOT_EXISTS), HttpStatus.NOT_FOUND);
 		}
 	}
 
@@ -148,16 +153,14 @@ public class UserController {
 			ProductDTO productDTO = new RestTemplate().getForObject(productUri + "product/get/Id/" + prodId,
 					ProductDTO.class);
 			if (productDTO == null)
-				throw new UserMSException("PRODUCT_INVALID_UNAVAILABLE");
+				throw new UserMSException(PRODUCT_INVALID_UNAVAILABLE);
 			String result = buyerService.addToWishlist(productDTO.getProdId(), buyerId);
 
 			return new ResponseEntity<>(result, HttpStatus.ACCEPTED);
 		} catch (HttpClientErrorException e) {
+			return new ResponseEntity<>(environment.getProperty(PRODUCT_DOES_NOT_EXISTS), HttpStatus.NOT_FOUND);
+		} catch (UserMSException e) {
 			return new ResponseEntity<>(environment.getProperty(e.getMessage()), HttpStatus.BAD_REQUEST);
-
-		} catch (Exception e) {
-			String errorMsg = e.getMessage();
-			return new ResponseEntity<>(errorMsg, HttpStatus.BAD_REQUEST);
 		}
 	}
 
@@ -174,14 +177,15 @@ public class UserController {
 			ProductDTO productDTO = new RestTemplate().getForObject(productUri + "product/get/Id/" + prodId,
 					ProductDTO.class);
 			if (productDTO == null)
-				throw new UserMSException("PRODUCT_INVALID_UNAVAILABLE");
+				throw new UserMSException(PRODUCT_INVALID_UNAVAILABLE);
 			if (productDTO.getStock() < quantity)
-				throw new UserMSException("Unable to process your request. Stock Insufficient, current stock value is "
-						+ productDTO.getStock());
+				throw new UserMSException("STOCK_INSUFFICIENT");
 			String result = buyerService.addToCart(productDTO.getProdId(), buyerId, quantity);
 			return new ResponseEntity<>(result, HttpStatus.ACCEPTED);
-		} catch (Exception e) {
-			return new ResponseEntity<>(environment.getProperty("PRODUCT_INVALID_UNAVAILABLE"), HttpStatus.BAD_REQUEST);
+		} catch (HttpClientErrorException e) {
+			return new ResponseEntity<>(environment.getProperty(PRODUCT_DOES_NOT_EXISTS), HttpStatus.NOT_FOUND);
+		} catch (UserMSException e) {
+			return new ResponseEntity<>(environment.getProperty(e.getMessage()), HttpStatus.BAD_REQUEST);
 		}
 	}
 
@@ -194,7 +198,7 @@ public class UserController {
 			return new ResponseEntity<>(cartDTOs, HttpStatus.ACCEPTED);
 		} catch (UserMSException e) {
 
-			return new ResponseEntity(e.getMessage(), HttpStatus.NOT_FOUND);
+			return new ResponseEntity(environment.getProperty(e.getMessage()), HttpStatus.NOT_FOUND);
 		}
 	}
 
@@ -208,7 +212,7 @@ public class UserController {
 					List.class);
 			return new ResponseEntity<>(orders, HttpStatus.OK);
 		} catch (HttpClientErrorException e) {
-			return new ResponseEntity(e.getMessage(), HttpStatus.NOT_FOUND);
+			return new ResponseEntity("No order history found for given BuyerID", HttpStatus.NOT_FOUND);
 		}
 	}
 
@@ -266,8 +270,7 @@ public class UserController {
 			String result = buyerService.removeFromWishlist(buyerId, prodId);
 			return new ResponseEntity<>(result, HttpStatus.OK);
 		} catch (UserMSException e) {
-			String errorMsg = e.getMessage();
-			return new ResponseEntity<>(errorMsg, HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(environment.getProperty(e.getMessage()), HttpStatus.NOT_FOUND);
 
 		}
 	}
@@ -281,15 +284,16 @@ public class UserController {
 			ProductDTO productDTO = new RestTemplate().getForObject(productUri + "product/get/Id/" + prodId,
 					ProductDTO.class);
 			if (productDTO == null)
-				throw new UserMSException("PRODUCT_INVALID_UNAVAILABLE");
+				throw new UserMSException(PRODUCT_INVALID_UNAVAILABLE);
 			if (productDTO.getStock() < quantity)
-				throw new UserMSException("Unable to process your request. Stock Insufficient, current stock value is "
-						+ productDTO.getStock());
+				throw new UserMSException("STOCK_INSUFFICIENT");
 			String result = buyerService.moveFromWishlistToCart(buyerId, prodId, quantity);
 			return new ResponseEntity<>(result, HttpStatus.ACCEPTED);
 
+		} catch (HttpClientErrorException e) {
+			return new ResponseEntity<>(environment.getProperty(PRODUCT_INVALID_UNAVAILABLE), HttpStatus.NOT_FOUND);
 		} catch (Exception e) {
-			return new ResponseEntity<>(environment.getProperty("PRODUCT_INVALID_UNAVAILABLE"), HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(environment.getProperty(e.getMessage()), HttpStatus.BAD_REQUEST);
 		}
 	}
 
@@ -300,7 +304,7 @@ public class UserController {
 			String result = new RestTemplate().postForObject(orderUri + "order/reOrder/" + orderId, null, String.class);
 			return new ResponseEntity<>(result, HttpStatus.OK);
 		} catch (HttpClientErrorException e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>("No Order history found for you", HttpStatus.NOT_FOUND);
 		}
 	}
 
@@ -313,7 +317,7 @@ public class UserController {
 					+ sellerService.sellerRegistration(sellerDto);
 			return new ResponseEntity<>(result, HttpStatus.OK);
 		} catch (UserMSException e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.EXPECTATION_FAILED);
+			return new ResponseEntity<>(environment.getProperty(e.getMessage()), HttpStatus.EXPECTATION_FAILED);
 		}
 
 	}
@@ -325,7 +329,7 @@ public class UserController {
 			String result = sellerService.sellerLogin(loginDTO);
 			return new ResponseEntity<>(result, HttpStatus.OK);
 		} catch (UserMSException e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(environment.getProperty(e.getMessage()), HttpStatus.NOT_FOUND);
 		}
 	}
 
@@ -338,7 +342,7 @@ public class UserController {
 			new RestTemplate().delete(productUri + "product/deleteAll/" + sellerId);
 			return new ResponseEntity<>(msg, HttpStatus.OK);
 		} catch (UserMSException e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(environment.getProperty(e.getMessage()), HttpStatus.NOT_FOUND);
 		}
 	}
 
@@ -347,10 +351,9 @@ public class UserController {
 	public ResponseEntity<String> addProduct(@RequestBody ProductDTO productDTO) {
 		try {
 			String result = new RestTemplate().postForObject(productUri + "product/add", productDTO, String.class);
-			String response = "Your product is successfully added with product ID: " + result;
-			return new ResponseEntity<>(response, HttpStatus.CREATED);
-		} catch (HttpClientErrorException e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.ALREADY_REPORTED);
+			return new ResponseEntity<>(result, HttpStatus.CREATED);
+		} catch (Exception e) {
+			return new ResponseEntity<>(environment.getProperty("PRODUCT_ALREADY_EXISTS"), HttpStatus.ALREADY_REPORTED);
 		}
 	}
 
@@ -363,7 +366,7 @@ public class UserController {
 			String response = "Deleted Successfully";
 			return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
 		} catch (HttpClientErrorException e) {
-			return new ResponseEntity<>(environment.getProperty("PRODUCT_INVALID_UNAVAILABLE"), HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(environment.getProperty(PRODUCT_INVALID_UNAVAILABLE), HttpStatus.BAD_REQUEST);
 		}
 	}
 
@@ -392,10 +395,15 @@ public class UserController {
 	@PostMapping(value = "/userMS/cart/checkout", consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> checkout(@RequestBody OrderDTO orderDTO) {
 		try {
+			if (buyerService.isCartEmpty(orderDTO.getBuyerId()))
+				throw new UserMSException("Service.CART_EMPTY");
 			String result = new RestTemplate().postForObject(orderUri + "order/place", orderDTO, String.class);
 			return new ResponseEntity<String>(result, HttpStatus.ACCEPTED);
+
 		} catch (HttpClientErrorException e) {
 			return new ResponseEntity(e.getMessage(), HttpStatus.NOT_ACCEPTABLE);
+		} catch (UserMSException e) {
+			return new ResponseEntity(environment.getProperty(e.getMessage()), HttpStatus.NOT_ACCEPTABLE);
 		}
 	}
 
