@@ -9,7 +9,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -45,16 +44,11 @@ public class UserController {
 	@Autowired
 	SellerService sellerService;
 
-	@Autowired
-	private KafkaTemplate<String, String> kafkaTemplate;
-
 	@Value("${product.uri}")
 	String productUri;
 
 	@Value("${order.uri}")
 	String orderUri;
-
-	private static final String TOPIC_NAME = "OrderData";
 
 	// Register the Buyer
 	@PostMapping(value = "/userMS/buyer/register")
@@ -383,8 +377,7 @@ public class UserController {
 	}
 
 	@PutMapping(value = "/userMS/seller/update/stock/{productId}/{quantity}")
-	public ResponseEntity<String> updateStockBYSeller(@PathVariable String productId, @PathVariable Integer quantity)
-			 {
+	public ResponseEntity<String> updateStockBYSeller(@PathVariable String productId, @PathVariable Integer quantity) {
 		try {
 			new RestTemplate().put(productUri + "product/update/stock/" + productId + "/" + quantity, null);
 			String result = "Stock Updated Successfully with productId-: " + productId + " and quantity: " + quantity;
@@ -399,22 +392,11 @@ public class UserController {
 	@PostMapping(value = "/userMS/cart/checkout", consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> checkout(@RequestBody OrderDTO orderDTO) {
 		try {
-			String buyerId = orderDTO.getBuyerId();
-			String address = orderDTO.getAddress();
-			String message = buyerId + "@" + address;
-
-			String result = "ORDER PLACED";
-
-			if (!buyerService.isCartEmpty(buyerId)) {
-				kafkaTemplate.send(TOPIC_NAME, message);
-				return new ResponseEntity<>(result, HttpStatus.ACCEPTED);
-			}
-
-		} catch (Exception e) {
-
+			String result = new RestTemplate().postForObject(orderUri + "order/place", orderDTO, String.class);
+			return new ResponseEntity<String>(result, HttpStatus.ACCEPTED);
+		} catch (HttpClientErrorException e) {
 			return new ResponseEntity(e.getMessage(), HttpStatus.NOT_ACCEPTABLE);
 		}
-		return null;
 	}
 
 	// get reward points for specific user
