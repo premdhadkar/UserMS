@@ -154,12 +154,12 @@ public class UserController {
 			ProductDTO productDTO = new RestTemplate().getForObject(productUri + "product/get/Id/" + prodId,
 					ProductDTO.class);
 			if (productDTO == null)
-				throw new Exception("Some error occured");
+				throw new UserMSException("PRODUCT_INVALID_UNAVAILABLE");
 			String result = buyerService.addToWishlist(productDTO.getProdId(), buyerId);
 
 			return new ResponseEntity<>(result, HttpStatus.ACCEPTED);
 		} catch (HttpClientErrorException e) {
-			return new ResponseEntity<>(environment.getProperty("PRODUCT_INVALID_UNAVAILABLE"), HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(environment.getProperty(e.getMessage()), HttpStatus.BAD_REQUEST);
 
 		} catch (Exception e) {
 			String errorMsg = e.getMessage();
@@ -179,16 +179,15 @@ public class UserController {
 			 */
 			ProductDTO productDTO = new RestTemplate().getForObject(productUri + "product/get/Id/" + prodId,
 					ProductDTO.class);
+			if (productDTO == null)
+				throw new UserMSException("PRODUCT_INVALID_UNAVAILABLE");
 			if (productDTO.getStock() < quantity)
 				throw new UserMSException("Unable to process your request. Stock Insufficient, current stock value is "
 						+ productDTO.getStock());
 			String result = buyerService.addToCart(productDTO.getProdId(), buyerId, quantity);
 			return new ResponseEntity<>(result, HttpStatus.ACCEPTED);
-		} catch (HttpClientErrorException e) {
-			return new ResponseEntity<>(environment.getProperty("PRODUCT_INVALID_UNAVAILABLE"), HttpStatus.BAD_REQUEST);
 		} catch (Exception e) {
-			String errorMsg = e.getMessage();
-			return new ResponseEntity<>(errorMsg, HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(environment.getProperty("PRODUCT_INVALID_UNAVAILABLE"), HttpStatus.BAD_REQUEST);
 		}
 	}
 
@@ -208,7 +207,7 @@ public class UserController {
 	// get order history of particular Buyer
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@GetMapping(value = "userMS/buyer/orderHistory/{buyerId}")
-	public ResponseEntity<List<OrderDTO>> getOrderHistoryOfBuyer(@PathVariable String buyerId) throws UserMSException {
+	public ResponseEntity<List<OrderDTO>> getOrderHistoryOfBuyer(@PathVariable String buyerId) {
 		try {
 
 			List<OrderDTO> orders = new RestTemplate().getForObject(orderUri + "order/view/byBuyerId/" + buyerId,
@@ -280,23 +279,23 @@ public class UserController {
 	}
 
 	// Move from Wishlist to cart
+	@SuppressWarnings("null")
 	@PostMapping(value = "/userMS/buyer/wishlist/cart/{buyerId}/{prodId}/{quantity}")
 	public ResponseEntity<String> moveWishlistToCart(@PathVariable String buyerId, @PathVariable String prodId,
 			@PathVariable Integer quantity) {
 		try {
 			ProductDTO productDTO = new RestTemplate().getForObject(productUri + "product/get/Id/" + prodId,
 					ProductDTO.class);
+			if (productDTO == null)
+				throw new UserMSException("PRODUCT_INVALID_UNAVAILABLE");
 			if (productDTO.getStock() < quantity)
 				throw new UserMSException("Unable to process your request. Stock Insufficient, current stock value is "
 						+ productDTO.getStock());
 			String result = buyerService.moveFromWishlistToCart(buyerId, prodId, quantity);
 			return new ResponseEntity<>(result, HttpStatus.ACCEPTED);
-		} catch (HttpClientErrorException e) {
-			return new ResponseEntity<>(environment.getProperty("PRODUCT_INVALID_UNAVAILABLE"), HttpStatus.BAD_REQUEST);
 
-		} catch (UserMSException e) {
-			String errorMsg = e.getMessage();
-			return new ResponseEntity<>(errorMsg, HttpStatus.BAD_REQUEST);
+		} catch (Exception e) {
+			return new ResponseEntity<>(environment.getProperty("PRODUCT_INVALID_UNAVAILABLE"), HttpStatus.BAD_REQUEST);
 		}
 	}
 
@@ -385,7 +384,7 @@ public class UserController {
 
 	@PutMapping(value = "/userMS/seller/update/stock/{productId}/{quantity}")
 	public ResponseEntity<String> updateStockBYSeller(@PathVariable String productId, @PathVariable Integer quantity)
-			throws UserMSException {
+			 {
 		try {
 			new RestTemplate().put(productUri + "product/update/stock/" + productId + "/" + quantity, null);
 			String result = "Stock Updated Successfully with productId-: " + productId + " and quantity: " + quantity;
