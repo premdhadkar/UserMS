@@ -6,6 +6,10 @@ import com.team21.exception.UserMSException;
 
 public class UserValidator {
 
+	private UserValidator() {
+		super();
+	}
+
 	public static void validateBuyer(BuyerDTO buyer) throws UserMSException {
 
 		if (!validateName(buyer.getName()))
@@ -40,41 +44,29 @@ public class UserValidator {
 
 	public static boolean validateName(String name) {
 
-		String regex = "[A-Za-z]+([ ][A-Za-z]+)*";
+		String regex = "[A-Za-z]+([ ][A-Za-z]+){0,10}";
 
-		if (name.matches(regex))
-			return true;
-
-		return false;
+		return name.matches(regex);
 
 	}
 
 	public static boolean validateEmail(String email) {
-		String regex = "[A-za-z]+@[A-za-z]+[\\.]com";
+		String regex = "[A-Za-z]+@[A-Za-z]+[\\.]com";
 
-		if (email.matches(regex))
-			return true;
-
-		return false;
+		return email.matches(regex);
 	}
 
 	public static boolean validateContactNumber(String contactNumber) {
 
-		String regex = "[6,7,8,9][0-9]{9}";
+		String regex = "[6-9][0-9]{9}";
 
-		if (contactNumber.matches(regex))
-			return true;
-
-		return false;
+		return contactNumber.matches(regex);
 	}
 
 	public static boolean validatePassword(String password) {
 		String regex = "^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{7,20}$";
 
-		if (password.matches(regex))
-			return true;
-
-		return false;
+		return password.matches(regex);
 	}
 
 }

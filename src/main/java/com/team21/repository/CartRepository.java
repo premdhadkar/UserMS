@@ -13,6 +13,6 @@ public interface CartRepository extends CrudRepository<CartEntity, CompositeKey>
 
 	public void deleteByCompoundKeyBuyerIdAndCompoundKeyProdId(String buyId, String prodId);
 
-	public CartEntity findByCompoundKeyBuyerIdAndCompoundKeyProdId(String buyId, String ProdId);
+	public CartEntity findByCompoundKeyBuyerIdAndCompoundKeyProdId(String buyId, String prodId);
 
 }

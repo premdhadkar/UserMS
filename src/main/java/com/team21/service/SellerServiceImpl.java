@@ -16,12 +16,7 @@ import com.team21.validator.UserValidator;
 @Service(value = "sellerService")
 public class SellerServiceImpl implements SellerService {
 
-	private static int sellerCount;
-
-	static {
-		sellerCount = 100;
-
-	}
+	private static int sellerCount = 100;
 
 	@Autowired
 	private SellerRepository sellerRepository;

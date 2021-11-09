@@ -2,7 +2,6 @@ package com.team21.utility;
 
 import java.io.Serializable;
 import java.util.Objects;
-
 import javax.persistence.Embeddable;
 
 @Embeddable
