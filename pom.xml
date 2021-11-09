@@ -21,8 +21,7 @@
 
 		<sonar.organization>ritika0912</sonar.organization>
 		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
-		<sonar.login>f2cecd60d83c125ff7798c6670ce2a817d845b13</sonar.login>
-
+		
 	</properties>
 
 	<dependencies>
