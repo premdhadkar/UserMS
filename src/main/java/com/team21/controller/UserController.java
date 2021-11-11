@@ -27,6 +27,7 @@ import com.team21.dto.OrderDTO;
 import com.team21.dto.ProductDTO;
 import com.team21.dto.ProductOrderedDTO;
 import com.team21.dto.SellerDTO;
+import com.team21.dto.SubscribedProductDTO;
 import com.team21.exception.UserMSException;
 import com.team21.service.BuyerService;
 import com.team21.service.SellerService;
@@ -433,5 +434,30 @@ public class UserController {
 
 		}
 	}
+	
+	@PostMapping(value = "/userMS/buyer/addSubscription")
+	public ResponseEntity<String> addSubscription(@RequestBody SubscribedProductDTO subscribedProductDTO) {
+		try {
+			String result = new RestTemplate().postForObject(productUri + "product/subscriptions/add/",
+					subscribedProductDTO, String.class);
+			return new ResponseEntity<>(result, HttpStatus.OK);
+		} catch (HttpClientErrorException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+		}
+	}
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@GetMapping(value = "/userMS/buyer/get/specificSubscription/{buyerId}/{prodId}")
+	public ResponseEntity<SubscribedProductDTO> getSubscription(@PathVariable String buyerId, @PathVariable String prodId){ 
+		try {
+			SubscribedProductDTO subscribedProductDTO =
+					new RestTemplate().getForObject(productUri+ "product/subscriptions/get/"+buyerId+"/"+prodId, SubscribedProductDTO.class);
+			return new ResponseEntity<>(subscribedProductDTO, HttpStatus.OK);
+			
+		}catch(Exception e) {
+			return new ResponseEntity(e.getMessage(), HttpStatus.NOT_FOUND);
+		}
+	}
+S
 
 }
