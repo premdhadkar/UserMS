@@ -28,6 +28,7 @@ import com.team21.dto.OrderDTO;
 import com.team21.dto.ProductDTO;
 import com.team21.dto.ProductOrderedDTO;
 import com.team21.dto.SellerDTO;
+import com.team21.dto.SubscribedProductDTO;
 import com.team21.exception.UserMSException;
 import com.team21.service.BuyerService;
 import com.team21.service.SellerService;
@@ -383,8 +384,7 @@ public class UserController {
 	}
 
 	@PutMapping(value = "/userMS/seller/update/stock/{productId}/{quantity}")
-	public ResponseEntity<String> updateStockBYSeller(@PathVariable String productId, @PathVariable Integer quantity)
-			 {
+	public ResponseEntity<String> updateStockBYSeller(@PathVariable String productId, @PathVariable Integer quantity) {
 		try {
 			new RestTemplate().put(productUri + "product/update/stock/" + productId + "/" + quantity, null);
 			String result = "Stock Updated Successfully with productId-: " + productId + " and quantity: " + quantity;
@@ -441,6 +441,30 @@ public class UserController {
 
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
 
+		}
+	}
+
+	@PostMapping(value = "/userMS/buyer/addSubscription")
+	public ResponseEntity<String> addSubscription(@RequestBody SubscribedProductDTO subscribedProductDTO) {
+		try {
+			String result = new RestTemplate().postForObject(productUri + "product/subscriptions/add/",
+					subscribedProductDTO, String.class);
+			return new ResponseEntity<>(result, HttpStatus.OK);
+		} catch (HttpClientErrorException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+		}
+	}
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@GetMapping(value = "/userMS/buyer/get/specificSubscription/{buyerId}/{prodId}")
+	public ResponseEntity<SubscribedProductDTO> getSubscription(@PathVariable String buyerId, @PathVariable String prodId){ 
+		try {
+			SubscribedProductDTO subscribedProductDTO =
+					new RestTemplate().getForObject(productUri+ "product/subscriptions/get/"+buyerId+"/"+prodId, SubscribedProductDTO.class);
+			return new ResponseEntity<>(subscribedProductDTO, HttpStatus.OK);
+			
+		}catch(Exception e) {
+			return new ResponseEntity(e.getMessage(), HttpStatus.NOT_FOUND);
 		}
 	}
 
